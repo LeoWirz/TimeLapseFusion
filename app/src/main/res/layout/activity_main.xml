@@ -56,11 +56,20 @@
             android:id="@+id/imageView"
             android:layout_width="323dp"
             android:layout_height="202dp"
+            android:layout_weight="0.16"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.512"
             app:layout_constraintVertical_bias="0.498"
-            app:srcCompat="@android:color/holo_blue_dark"
-            android:layout_weight="0.16" />
+            app:srcCompat="@android:color/holo_blue_dark" />
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/glView"
+            android:layout_width="360dp"
+            android:layout_height="200dp"
+            android:layout_weight="0.1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.512"
+            app:layout_constraintVertical_bias="0.498"/>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

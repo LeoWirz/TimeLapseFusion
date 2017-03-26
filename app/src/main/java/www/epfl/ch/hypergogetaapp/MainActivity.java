@@ -1,12 +1,11 @@
 package www.epfl.ch.hypergogetaapp;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -14,6 +13,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 import static android.media.MediaMetadataRetriever.OPTION_CLOSEST;
 
@@ -23,6 +25,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //new www.epfl.ch.hypergogetaapp.MainActivity.VideoRenderer();
+        GLSurfaceView view = (GLSurfaceView) findViewById(R.id.glView);
+        view.setEGLContextClientVersion(2);
+        //view.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        view.setRenderer(new VideoRenderer());
+
 
         // Initialize media retriever
         retriever = new MediaMetadataRetriever();
@@ -107,5 +117,4 @@ public class MainActivity extends AppCompatActivity {
 
     // Handle the video
     private MediaMetadataRetriever retriever;
-
 }
