@@ -6,9 +6,6 @@
     android:layout_height="match_parent"
     tools:context="www.epfl.ch.hypergogetaapp.MainActivity">
 
-    <include layout="@layout/content_main"
-        android:id="@+id/include" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -70,6 +67,34 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.512"
             app:layout_constraintVertical_bias="0.498"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal">
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="5" />
+
+            <EditText
+                android:id="@+id/frameSizeNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="number" />
+
+        </LinearLayout>
+
     </LinearLayout>
+
+    <include
+        android:id="@+id/include"
+        layout="@layout/content_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="5" />
 
 </android.support.design.widget.CoordinatorLayout>

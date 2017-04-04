@@ -8,16 +8,27 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
+import android.widget.SeekBar;
 import android.widget.TextView;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.SeekBar;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import static android.media.MediaMetadataRetriever.OPTION_CLOSEST;
+import static java.lang.Integer.parseInt;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +48,42 @@ public class MainActivity extends AppCompatActivity {
         // Initialize media retriever
         retriever = new MediaMetadataRetriever();
         showFileChooser();
+
+        //seekbar for from window size
+        final SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
+        final EditText frameSizeValue = (EditText)findViewById(R.id.frameSizeNumber);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                frameSizeValue.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        frameSizeValue.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > 100){
+                    value = 100;
+                    frameSizeValue.setText(String.valueOf(value));
+                }
+
+                seekBar.setProgress(value);
+                return true;
+            }
+        });
+
     }
 
     // Not important
@@ -67,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     public void changeFrame(View view) {
         // Read the frame number in the text field
         TextView frameInput = (TextView) findViewById(R.id.frameNumberEntry);
-        int frameNumber = Integer.parseInt(frameInput.getText().toString());
+        int frameNumber = parseInt(frameInput.getText().toString());
 
         // Retrieve the frame from the video (time in micro seconds)
         Bitmap bmp = retriever.getFrameAtTime(frameNumber * (long)1000000.f / (long)25, OPTION_CLOSEST);
@@ -117,4 +164,5 @@ public class MainActivity extends AppCompatActivity {
 
     // Handle the video
     private MediaMetadataRetriever retriever;
+
 }
