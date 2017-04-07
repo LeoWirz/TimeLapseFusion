@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -42,21 +43,27 @@ public class MainActivity extends AppCompatActivity {
         view.setEGLContextClientVersion(2);
         //view.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        view.setRenderer(new VideoRenderer());
-
+        videoRenderer = new VideoRenderer();
+        view.setRenderer(videoRenderer);
 
         // Initialize media retriever
         retriever = new MediaMetadataRetriever();
         showFileChooser();
 
-        //seekbar for from window size
-        final SeekBar seekBar = (SeekBar)findViewById(R.id.seekBar);
-        final EditText frameSizeValue = (EditText)findViewById(R.id.frameSizeNumber);
+        ImageView imgViewFirstFrame = (ImageView) findViewById(R.id.imageViewFirstFrame);
+        ImageView imgViewLastFrame = (ImageView) findViewById(R.id.imageViewLastFrame);
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        frameManager = new FrameManager(videoRenderer, retriever, imgViewFirstFrame, imgViewLastFrame);
+
+        //seekbar for first frame
+        final SeekBar seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
+        final EditText editTextFirstFrame = (EditText)findViewById(R.id.editTextFirstFrame);
+
+        seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                frameSizeValue.setText(String.valueOf(progress));
+                editTextFirstFrame.setText(String.valueOf(progress));
+                frameManager.changeFirstFrame(progress);
             }
 
             @Override
@@ -70,20 +77,58 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        frameSizeValue.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editTextFirstFrame.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 int value = Integer.parseInt(v.getText().toString());
                 if(value > 100){
                     value = 100;
-                    frameSizeValue.setText(String.valueOf(value));
+                    editTextFirstFrame.setText(String.valueOf(value));
                 }
 
-                seekBar.setProgress(value);
+                seekBarFirstFrame.setProgress(value);
                 return true;
             }
         });
 
+        //seekbar for window size
+        final SeekBar seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
+        final EditText editTextWindowSize = (EditText)findViewById(R.id.editTextWindowSize);
+
+        seekBarWindowSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                editTextWindowSize.setText(String.valueOf(progress));
+                frameManager.changeWindowSize(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        editTextWindowSize.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > 100){
+                    value = 100;
+                    editTextWindowSize.setText(String.valueOf(value));
+                }
+
+                seekBarWindowSize.setProgress(value);
+                return true;
+            }
+        });
+
+        // Initialize with first frame at zero
+        //changeFrame();
     }
 
     // Not important
@@ -108,24 +153,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    // Call when Change Frame is pressed. Reads the frame number in the text field, get the frame from the video and display it
-    public void changeFrame(View view) {
-        // Read the frame number in the text field
-        TextView frameInput = (TextView) findViewById(R.id.frameNumberEntry);
-        int frameNumber = parseInt(frameInput.getText().toString());
-
-        // Retrieve the frame from the video (time in micro seconds)
-        Bitmap bmp = retriever.getFrameAtTime(frameNumber * (long)1000000.f / (long)25, OPTION_CLOSEST);
-
-        // Display the frame
-        ImageView img_view = (ImageView) findViewById(R.id.imageView);
-        img_view.setImageBitmap(bmp);
-
-        // Display frame number
-        TextView textView = (TextView) findViewById(R.id.textViewFrameNumber);
-        textView.setText("Frame: " + Integer.toString(frameNumber));
     }
 
     private int PICK_VIDEO_REQUEST = 2;
@@ -164,5 +191,6 @@ public class MainActivity extends AppCompatActivity {
 
     // Handle the video
     private MediaMetadataRetriever retriever;
-
+    private VideoRenderer videoRenderer;
+    private FrameManager frameManager;
 }
