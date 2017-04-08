@@ -44,7 +44,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="30dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.1"
             android:orientation="horizontal">
@@ -52,13 +52,13 @@
             <SeekBar
                 android:id="@+id/seekBarFirstFrame"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="5" />
 
             <EditText
                 android:id="@+id/editTextFirstFrame"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:inputType="number" />
         </LinearLayout>
@@ -74,7 +74,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="30dp"
             android:layout_marginTop="5dp"
             android:layout_weight="0.1"
             android:orientation="horizontal">
@@ -82,13 +82,13 @@
             <SeekBar
                 android:id="@+id/seekBarWindowSize"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="5" />
 
             <EditText
                 android:id="@+id/editTextWindowSize"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:inputType="number" />
         </LinearLayout>
@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_weight="0.1"
+            android:layout_weight="0.08"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -119,7 +119,7 @@
                 <ImageView
                     android:id="@+id/imageViewFirstFrame"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="150dp"
                     android:layout_marginTop="5dp"
                     android:layout_weight="0.5" />
             </LinearLayout>
@@ -142,7 +142,7 @@
                 <ImageView
                     android:id="@+id/imageViewLastFrame"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="150dp"
                     android:layout_marginTop="5dp"
                     android:layout_weight="0.5" />
             </LinearLayout>

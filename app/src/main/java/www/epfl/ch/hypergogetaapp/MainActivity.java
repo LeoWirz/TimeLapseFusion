@@ -33,6 +33,10 @@ import static java.lang.Integer.parseInt;
 
 public class MainActivity extends AppCompatActivity {
 
+    final static int MAX_WINDOW_SIZE = 15;
+    // TODO this depends on the video
+    final static int MAX_FRAME_NUMBER = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,19 +55,23 @@ public class MainActivity extends AppCompatActivity {
         showFileChooser();
 
         ImageView imgViewFirstFrame = (ImageView) findViewById(R.id.imageViewFirstFrame);
-        ImageView imgViewLastFrame = (ImageView) findViewById(R.id.imageViewLastFrame);
+        ImageView imgViewLastFrame  = (ImageView) findViewById(R.id.imageViewLastFrame);
 
         frameManager = new FrameManager(videoRenderer, retriever, imgViewFirstFrame, imgViewLastFrame);
+        frameManager.start();
 
         //seekbar for first frame
         final SeekBar seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
+
+        // TODO find out number of frames in the video
+        seekBarFirstFrame.setMax(MAX_FRAME_NUMBER);
+
         final EditText editTextFirstFrame = (EditText)findViewById(R.id.editTextFirstFrame);
 
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 editTextFirstFrame.setText(String.valueOf(progress));
-                frameManager.changeFirstFrame(progress);
             }
 
             @Override
@@ -73,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                frameManager.changeFirstFrame(seekBar.getProgress());
             }
         });
 
@@ -81,25 +89,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 int value = Integer.parseInt(v.getText().toString());
-                if(value > 100){
-                    value = 100;
+                if(value > MAX_FRAME_NUMBER){
+                    value = MAX_FRAME_NUMBER;
                     editTextFirstFrame.setText(String.valueOf(value));
                 }
 
                 seekBarFirstFrame.setProgress(value);
+                frameManager.changeFirstFrame(value);
                 return true;
             }
         });
 
         //seekbar for window size
         final SeekBar seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
+        seekBarWindowSize.setMax(15);
         final EditText editTextWindowSize = (EditText)findViewById(R.id.editTextWindowSize);
 
         seekBarWindowSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 editTextWindowSize.setText(String.valueOf(progress));
-                frameManager.changeWindowSize(progress);
             }
 
             @Override
@@ -109,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                frameManager.changeWindowSize(seekBar.getProgress());
             }
         });
 
@@ -117,18 +126,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 int value = Integer.parseInt(v.getText().toString());
-                if(value > 100){
-                    value = 100;
+                if(value > MAX_WINDOW_SIZE){
+                    value = MAX_WINDOW_SIZE;
                     editTextWindowSize.setText(String.valueOf(value));
                 }
 
                 seekBarWindowSize.setProgress(value);
+                frameManager.changeWindowSize(value);
                 return true;
             }
         });
-
-        // Initialize with first frame at zero
-        //changeFrame();
     }
 
     // Not important
