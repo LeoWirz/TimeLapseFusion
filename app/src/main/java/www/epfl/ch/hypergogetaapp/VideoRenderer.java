@@ -24,40 +24,13 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class VideoRenderer implements GLSurfaceView.Renderer {
 
-    public void init(){
-        float[] uv = { 0.0f, 1.0f,
-                       1.0f, 1.0f,
-                       0.0f, 0.0f,
-                       1.0f, 0.0f };
-
-        float[] position = { -1.0f, 1.0f,
-                             1.0f, 1.0f,
-                             -1.0f, -1.0f,
-                             1.0f, -1.0f };
-
-        short[] indexes = { 0,1,2,3 };
-
-        createBuffer(uv, _uvBuffer);
-        createBuffer(position, _vertexBuffer);
-        createBuffer(indexes, _indexBuffer);
-
-        _renderVideoShader = createShaderProgram(vertexShader_src, pixelShader_src);
-
-        GLES20.glDisable(GL10.GL_DEPTH_TEST);
-    }
-
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-        //init();
-
-        // Set the background frame color
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-        System.out.println("OK init");
+        init();
     }
 
     public void onDrawFrame(GL10 unused) {
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
-        /*Bitmap toUpload = null;
+        Bitmap toUpload = null;
         synchronized (_bitmaps) {
             toUpload = _bitmaps.poll();
         }
@@ -75,7 +48,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             _glTextures.clear();
         }
 
-        render();*/
+        render();
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -99,30 +72,87 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _windowSize = size;
     }
 
+    private void init(){
+        float[] uv = {
+                0.0f, 0.0f,
+                1.0f, 0.0f,
+                1.0f, 1.0f,
+                0.0f, 1.0f };
+
+        float coef = 0.9f;
+        float[] position = {
+                -1.0f*coef, 1.0f*coef,
+                1.0f*coef, 1.0f*coef,
+                1.0f*coef, -1.0f*coef,
+                -1.0f*coef, -1.0f*coef };
+
+        short[] indexes = { 0,1,2, 2,3,0 };
+
+        _uvBuffer = createBuffer(uv);
+        _vertexBuffer = createBuffer(position);
+        _indexBuffer = createBuffer(indexes);
+
+        _renderVideoShader = createShaderProgram(vertexShader_src, pixelShader_src);
+
+        GLES20.glDisable(GL10.GL_DEPTH_TEST);
+        GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+    }
+
     private void render(){
-        /*GLES20.glEnable(GL10.GL_TEXTURE_2D);
-        GLES20.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-        GLES20.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-        GLES20.glVert(2, GL10.GL_FLOAT, 0, textureBuffer);
-
-// ... here goes the rendering of the mesh ...
-
-
-        gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-        gl.glDisable(GL10.GL_TEXTURE_2D);*/
 
         if(_glTextures.isEmpty()){
             //return;
         }
+        else{
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, _glTextures.get(_glTextures.size()-1)[0]);
+        }
 
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-        //GLES20.glUseProgram(_renderVideoShader);
+        GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
+        GLES20.glUseProgram(_renderVideoShader);
+
+        /*************************/
+        /* Setup uniform         */
+        /*************************/
+
+        int samplerLoc = GLES20.glGetUniformLocation (_renderVideoShader, "texture[0]" );
+        GLES20.glUniform1i ( samplerLoc, 0);
+
+        /*************************/
+        /* Setup attrib location */
+        /*************************/
+
+        int vertexAttribLocation = GLES20.glGetAttribLocation(_renderVideoShader, "vertex");
+        int texCoordAttribLocation = GLES20.glGetAttribLocation(_renderVideoShader, "texCoord");
+
+        // Enable generic vertex attribute array
+        GLES20.glEnableVertexAttribArray(vertexAttribLocation);
+        GLES20.glEnableVertexAttribArray(texCoordAttribLocation);
+
+        // Prepare the quad coordinate data
+        GLES20.glVertexAttribPointer(vertexAttribLocation, 2,
+                GLES20.GL_FLOAT, false,
+                0, _vertexBuffer);
+
+        GLES20.glVertexAttribPointer(texCoordAttribLocation, 2,
+                GLES20.GL_FLOAT, false,
+                0, _uvBuffer);
+
+        // Draw the quad
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6,
+                GLES20.GL_UNSIGNED_SHORT, _indexBuffer);
+
+        // Disable vertex array
+        GLES20.glDisableVertexAttribArray(vertexAttribLocation);
+        GLES20.glDisableVertexAttribArray(texCoordAttribLocation);
+        GLES20.glUseProgram(0);
     }
 
     private int uploadBitmap(Bitmap bitmap){
         int[] tex = new int[1];
         GLES20.glGenTextures(1, tex, 0);
 
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GL10.GL_TEXTURE_2D, tex[0]);
 
         GLES20.glTexParameterf(GL10.GL_TEXTURE_2D,
@@ -140,20 +170,24 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     }
 
     // upload the data into buffer
-    private void createBuffer(float[] data, FloatBuffer buffer) {
+    private FloatBuffer createBuffer(float[] data) {
         ByteBuffer byteBuf = ByteBuffer.allocateDirect(data.length * 4);
         byteBuf.order(ByteOrder.nativeOrder());
-        buffer = byteBuf.asFloatBuffer();
+        FloatBuffer buffer = byteBuf.asFloatBuffer();
         buffer.put(data);
         buffer.position(0);
+
+        return buffer;
     }
 
-    private void createBuffer(short[] data, ShortBuffer buffer) {
+    private ShortBuffer createBuffer(short[] data) {
         ByteBuffer byteBuf = ByteBuffer.allocateDirect(data.length * 2);
         byteBuf.order(ByteOrder.nativeOrder());
-        buffer = byteBuf.asShortBuffer();
+        ShortBuffer buffer = byteBuf.asShortBuffer();
         buffer.put(data);
         buffer.position(0);
+
+        return buffer;
     }
 
     private static int loadShader(int type, String shaderCode){
@@ -163,6 +197,15 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
+
+        int[] compiled = new int[1];
+        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);	//compile[0] != 0 : compiled successfully
+        if (compiled[0] == 0) {
+            System.out.println("Error compiling shader:");
+            System.out.println(shaderCode);
+            System.out.println("----> Error:");
+            System.out.println(GLES20.glGetShaderInfoLog(shader));
+        }
 
         return shader;
     }
@@ -188,19 +231,19 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private int _renderVideoShader = 0;
 
     private static final String vertexShader_src =
-            "attribute vec4 vertex;" +
-            "attribute vec2 texCoord;" +
-            "varying vec2 v_texCoord;" +
-            "void main(){" +
-            "   v_texCoord = texCoord;" +
-            "   gl_Position = vertex;" +
+            "attribute vec2 vertex; \n" +
+            "attribute vec2 texCoord; \n" +
+            "varying vec2 v_texCoord; \n" +
+            "void main(){ \n" +
+            "   v_texCoord = texCoord; \n" +
+            "   gl_Position = vec4(vertex,0,1); \n" +
             "}";
 
     private static final String pixelShader_src =
-            "precision mediump float;" +
-            "uniform sampler2D texture[1];" +
-            "varying vec2 v_texCoord;" +
-            "void main(){" +
-            "   gl_FragColor = texture2D( texture[0], v_texCoord );" +
+            "precision mediump float; \n" +
+            "uniform sampler2D texture[1]; \n" +
+            "varying vec2 v_texCoord; \n" +
+            "void main(){ \n" +
+            "   gl_FragColor = texture2D( texture[0], v_texCoord ); \n" +
             "}";
 }
