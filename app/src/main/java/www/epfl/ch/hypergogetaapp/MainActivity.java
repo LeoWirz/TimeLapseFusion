@@ -45,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
         //new www.epfl.ch.hypergogetaapp.MainActivity.VideoRenderer();
         GLSurfaceView view = (GLSurfaceView) findViewById(R.id.glView);
         view.setEGLContextClientVersion(2);
-        //view.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        //view.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         videoRenderer = new VideoRenderer();
         view.setRenderer(videoRenderer);
+        //view.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         // Initialize media retriever
         retriever = new MediaMetadataRetriever();
