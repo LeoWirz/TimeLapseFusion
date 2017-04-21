@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
         ImageView imgViewLastFrame  = (ImageView) findViewById(R.id.imageViewLastFrame);
 
         frameManager = new FrameManager(videoRenderer, retriever, imgViewFirstFrame, imgViewLastFrame);
-        frameManager.start();
 
         //seekbar for first frame
         final SeekBar seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
@@ -190,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
 
                 // Give it to the retriever
                 retriever.setDataSource(this, videoUri);
+
+                frameManager.start();
             }
         }
     }
