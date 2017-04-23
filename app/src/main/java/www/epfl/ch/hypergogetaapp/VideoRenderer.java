@@ -139,14 +139,18 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private void render(){
 
         if(_glTextures.isEmpty()){
-            //return;
+            return;
         }
         else{
             GLES30.glUseProgram(_renderVideoShader);
             GLES30.glUniform1i(_nbTextureLocation, min(_glTextures.size(), _maxTexUnit / 2));
 
             int texs[] = new int[min(_glTextures.size(), _maxTexUnit / 2) * 2];
-            for(int i=0 ; i<min(_glTextures.size(), _maxTexUnit / 2) ; ++i){
+
+            //System.out.print("windowesize:"+_windowSize + "   ");
+            //System.out.println((_glTextures.size()-min(_glTextures.size(), _maxTexUnit / 2)) + " to " + _glTextures.size());
+
+            for(int i=_glTextures.size()-min(_glTextures.size(), _maxTexUnit / 2) ; i<_glTextures.size() ; ++i){
                 texs[i*2] = _glTextures.get(i)[0];
                 texs[i*2+1] = _bluredTextures.get(i)[0];
             }
@@ -181,25 +185,31 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         int texCoordAttribLocation = GLES30.glGetAttribLocation(_renderVideoShader, "texCoord");
 
         // Enable generic vertex attribute array
-        GLES30.glEnableVertexAttribArray(vertexAttribLocation);
-        GLES30.glEnableVertexAttribArray(texCoordAttribLocation);
+        if(vertexAttribLocation >= 0)
+            GLES30.glEnableVertexAttribArray(vertexAttribLocation);
+        if(texCoordAttribLocation >= 0)
+            GLES30.glEnableVertexAttribArray(texCoordAttribLocation);
 
         // Prepare the quad coordinate data
-        GLES30.glVertexAttribPointer(vertexAttribLocation, 2,
-                GLES20.GL_FLOAT, false,
-                0, _vertexBuffer);
+        if(vertexAttribLocation >= 0)
+            GLES30.glVertexAttribPointer(vertexAttribLocation, 2,
+                    GLES20.GL_FLOAT, false,
+                    0, _vertexBuffer);
 
-        GLES30.glVertexAttribPointer(texCoordAttribLocation, 2,
-                GLES20.GL_FLOAT, false,
-                0, _uvBuffer);
+        if(texCoordAttribLocation >= 0)
+            GLES30.glVertexAttribPointer(texCoordAttribLocation, 2,
+                    GLES20.GL_FLOAT, false,
+                    0, _uvBuffer);
 
         // Draw the quad
         GLES30.glDrawElements(GLES20.GL_TRIANGLES, 6,
                 GLES20.GL_UNSIGNED_SHORT, _indexBuffer);
 
         // Disable vertex array
-        GLES30.glDisableVertexAttribArray(vertexAttribLocation);
-        GLES30.glDisableVertexAttribArray(texCoordAttribLocation);
+        if(vertexAttribLocation >= 0)
+            GLES30.glDisableVertexAttribArray(vertexAttribLocation);
+        if(texCoordAttribLocation >= 0)
+            GLES30.glDisableVertexAttribArray(texCoordAttribLocation);
 
     }
 
@@ -336,15 +346,37 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "uniform sampler2D texture[32]; \n" +
             "uniform int nbTexture; \n" +
             "varying vec2 v_texCoord; \n" +
-            "void main(){ \n" +
-            "vec4 finalColor = vec4(0,0.1,0,0);\n" +
-            "for(int i=0 ; i<nbTexture ; ++i){\n" +
-            "   finalColor += texture2D( texture[i*2], v_texCoord );\n" +
+
+            "float toGrey(vec3 c){ return c.r*0.299+c.g*0.587+c.b*0.114; }\n" +
+
+            "float exposdness(vec3 c){ return exp(-(c.r-0.5)*(c.r-0.5) / (2.0*0.2*0.2)) *\n" +
+            "                                 exp(-(c.g-0.5)*(c.g-0.5) / (2.0*0.2*0.2)) *\n" +
+            "                                 exp(-(c.b-0.5)*(c.b-0.5) / (2.0*0.2*0.2)); }\n" +
+
+            "float saturation(vec3 c){ \n" +
+            "   float mean = (c.r+c.g+c.b)/3.0;\n" +
+            "   return sqrt((c.r-mean)*(c.r-mean) + (c.g-mean)*(c.g-mean) + (c.b-mean)*(c.b-mean)); " +
             "}\n" +
-            "   gl_FragColor = finalColor / (nbTexture > 0 ? float(nbTexture) : 1.0); \n" +
+
+            "void main(){ \n" +
+            "float exp_c = 0.2, exp_s = 0.2, exp_e = 0.2;\n" +
+            "vec4 finalColor = vec4(0,0,0,0);\n" +
+            "float finalWeight = 0.0;\n" +
+            "vec4 color=vec4(0,0,0,1);\n" +
+            "for(int i=0 ; i<nbTexture ; ++i){\n" +
+            "   color = texture2D( texture[i*2], v_texCoord );\n" +
+            "   vec4 laplace = texture2D( texture[i*2+1], v_texCoord );\n" +
+            "   float weight = pow(clamp(toGrey(color.rgb-laplace.rgb),0.0,1.0),exp_c);\n" +
+            "   weight *= pow(saturation(color.rgb),exp_s);\n" +
+            "   weight *= pow(exposdness(color.rgb),exp_e);\n" +
+            "   weight += 0.01;\n" +
+            "   finalWeight += weight;\n" +
+            "   finalColor += color*weight;\n" +
+            "}\n" +
+            "   gl_FragColor = finalColor / finalWeight; \n" +
             "}";
 
-    private static int KERNEL_SIZE = 9;
+    private static int KERNEL_SIZE = 21;
     private static final String pixelHBlurShader_src =
             "precision highp float; \n" +
             "uniform sampler2D texture[1]; \n" +
