@@ -358,6 +358,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "   return sqrt((c.r-mean)*(c.r-mean) + (c.g-mean)*(c.g-mean) + (c.b-mean)*(c.b-mean)); " +
             "}\n" +
 
+            "float timeDecay(int frame){\n" +
+            "   return exp(-float(frame*frame)*0.00175 / (2.0*0.2*0.2));\n" +
+            "}\n" +
+
             "void main(){ \n" +
             "float exp_c = 0.2, exp_s = 0.2, exp_e = 0.2;\n" +
             "vec4 finalColor = vec4(0,0,0,0);\n" +
@@ -370,13 +374,14 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "   weight *= pow(saturation(color.rgb),exp_s);\n" +
             "   weight *= pow(exposdness(color.rgb),exp_e);\n" +
             "   weight += 0.01;\n" +
+            "   weight *= timeDecay(nbTexture-1-i);\n" +
             "   finalWeight += weight;\n" +
             "   finalColor += color*weight;\n" +
             "}\n" +
             "   gl_FragColor = finalColor / finalWeight; \n" +
             "}";
 
-    private static int KERNEL_SIZE = 21;
+    private static int KERNEL_SIZE = 41;
     private static final String pixelHBlurShader_src =
             "precision highp float; \n" +
             "uniform sampler2D texture[1]; \n" +
