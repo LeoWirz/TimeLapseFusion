@@ -1,7 +1,7 @@
 package www.epfl.ch.hypergogetaapp;
 
 import android.opengl.GLES20;
-import android.opengl.GLES30;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import android.graphics.Bitmap;
@@ -31,11 +31,14 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         init();
 
         int n[] = new int[1];
-        GLES30.glGetIntegerv(GLES30.GL_MAX_TEXTURE_IMAGE_UNITS, n,0);
+        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, n,0);
         _maxTexUnit = n[0];
     }
 
     public void onDrawFrame(GL10 unused) {
+        /*GLES20.glClearColor(1,0,0,1);
+        GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
+        return;*/
 
         Bitmap toUpload = null;
         synchronized (_bitmaps) {
@@ -47,31 +50,31 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             _glTextures.get(_glTextures.size()-1)[0] = uploadBitmap(toUpload);
 
             _bluredTextures.add(new int[1]);
-            _bluredTextures.get(_bluredTextures.size()-1)[0] = createTexture(toUpload.getWidth(), toUpload.getHeight(), GLES30.GL_RGBA);
+            _bluredTextures.get(_bluredTextures.size()-1)[0] = createTexture(toUpload.getWidth(), toUpload.getHeight(), GLES20.GL_RGBA);
             if(_dummyTexture == null){
                 _dummyTexture = new int[1];
-                _dummyTexture[0] = createTexture(toUpload.getWidth(), toUpload.getHeight(), GLES30.GL_RGBA);
+                _dummyTexture[0] = createTexture(toUpload.getWidth(), toUpload.getHeight(), GLES20.GL_RGBA);
             }
 
-            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, _frameBuffer[0]);
-            GLES30.glViewport(0, 0, toUpload.getWidth(), toUpload.getHeight());
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, _frameBuffer[0]);
+            GLES20.glViewport(0, 0, toUpload.getWidth(), toUpload.getHeight());
 
-            GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_TEXTURE_2D, _dummyTexture[0], 0);
+            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, _dummyTexture[0], 0);
             render(_HBlurShader, _glTextures.get(_glTextures.size()-1)[0]);
 
-            GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_TEXTURE_2D, _bluredTextures.get(_bluredTextures.size()-1)[0], 0);
+            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, _bluredTextures.get(_bluredTextures.size()-1)[0], 0);
             render(_VBlurShader, _dummyTexture[0]);
 
-            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
-            GLES30.glViewport(0, 0, _winWidth, _winHeight);
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+            GLES20.glViewport(0, 0, _winWidth, _winHeight);
         }
 
         if(_needClear){
             for(int[] tex : _glTextures){
-                GLES30.glDeleteTextures(1, tex, 0);
+                GLES20.glDeleteTextures(1, tex, 0);
             }
             for(int[] tex : _bluredTextures){
-                GLES30.glDeleteTextures(1, tex, 0);
+                GLES20.glDeleteTextures(1, tex, 0);
             }
             _needClear = false;
             _glTextures.clear();
@@ -84,7 +87,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 unused, int width, int height) {
         _winWidth = width;
         _winHeight = height;
-        GLES30.glViewport(0, 0, width, height);
+        GLES20.glViewport(0, 0, width, height);
     }
 
     public void addFrame(Bitmap bitmap) {
@@ -128,12 +131,12 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _HBlurShader = createShaderProgram(vertexShader_src, pixelHBlurShader_src);
         _VBlurShader = createShaderProgram(vertexShader_src, pixelVBlurShader_src);
 
-        _nbTextureLocation = GLES30.glGetUniformLocation(_renderVideoShader, "nbTexture");
+        _nbTextureLocation = GLES20.glGetUniformLocation(_renderVideoShader, "nbTexture");
 
-        GLES30.glGenFramebuffers(1, _frameBuffer, 0);
+        GLES20.glGenFramebuffers(1, _frameBuffer, 0);
 
-        GLES30.glDisable(GL10.GL_DEPTH_TEST);
-        GLES30.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+        GLES20.glDisable(GL10.GL_DEPTH_TEST);
+        GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
     }
 
     private void render(){
@@ -142,8 +145,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             return;
         }
         else{
-            GLES30.glUseProgram(_renderVideoShader);
-            GLES30.glUniform1i(_nbTextureLocation, min(_glTextures.size(), _maxTexUnit / 2));
+            GLES20.glUseProgram(_renderVideoShader);
+            GLES20.glUniform1i(_nbTextureLocation, min(_glTextures.size(), _maxTexUnit / 2));
 
             int texs[] = new int[min(_glTextures.size(), _maxTexUnit / 2) * 2];
 
@@ -155,12 +158,12 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
                 texs[i*2+1] = _bluredTextures.get(i)[0];
             }
 
-            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
-            GLES30.glClear(GL10.GL_COLOR_BUFFER_BIT);
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+            GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
             render(_renderVideoShader, texs);
         }
 
-        GLES30.glUseProgram(0);
+        GLES20.glUseProgram(0);
     }
 
     private void render(int shader, int texture) {
@@ -170,61 +173,61 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     }
 
     private void render(int shader, int textures[]) {
-        GLES30.glUseProgram(shader);
+        GLES20.glUseProgram(shader);
 
         for(int i=0 ; i<textures.length ; ++i){
-            GLES30.glActiveTexture(GLES20.GL_TEXTURE0 + i);
-            GLES30.glBindTexture(GLES20.GL_TEXTURE_2D, textures[i]);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + i);
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[i]);
         }
 
         /*************************/
         /* Setup attrib location */
         /*************************/
 
-        int vertexAttribLocation = GLES30.glGetAttribLocation(_renderVideoShader, "vertex");
-        int texCoordAttribLocation = GLES30.glGetAttribLocation(_renderVideoShader, "texCoord");
+        int vertexAttribLocation = GLES20.glGetAttribLocation(_renderVideoShader, "vertex");
+        int texCoordAttribLocation = GLES20.glGetAttribLocation(_renderVideoShader, "texCoord");
 
         // Enable generic vertex attribute array
         if(vertexAttribLocation >= 0)
-            GLES30.glEnableVertexAttribArray(vertexAttribLocation);
+            GLES20.glEnableVertexAttribArray(vertexAttribLocation);
         if(texCoordAttribLocation >= 0)
-            GLES30.glEnableVertexAttribArray(texCoordAttribLocation);
+            GLES20.glEnableVertexAttribArray(texCoordAttribLocation);
 
         // Prepare the quad coordinate data
         if(vertexAttribLocation >= 0)
-            GLES30.glVertexAttribPointer(vertexAttribLocation, 2,
+            GLES20.glVertexAttribPointer(vertexAttribLocation, 2,
                     GLES20.GL_FLOAT, false,
                     0, _vertexBuffer);
 
         if(texCoordAttribLocation >= 0)
-            GLES30.glVertexAttribPointer(texCoordAttribLocation, 2,
+            GLES20.glVertexAttribPointer(texCoordAttribLocation, 2,
                     GLES20.GL_FLOAT, false,
                     0, _uvBuffer);
 
         // Draw the quad
-        GLES30.glDrawElements(GLES20.GL_TRIANGLES, 6,
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, 6,
                 GLES20.GL_UNSIGNED_SHORT, _indexBuffer);
 
         // Disable vertex array
         if(vertexAttribLocation >= 0)
-            GLES30.glDisableVertexAttribArray(vertexAttribLocation);
+            GLES20.glDisableVertexAttribArray(vertexAttribLocation);
         if(texCoordAttribLocation >= 0)
-            GLES30.glDisableVertexAttribArray(texCoordAttribLocation);
+            GLES20.glDisableVertexAttribArray(texCoordAttribLocation);
 
     }
 
     private int uploadBitmap(Bitmap bitmap){
         int[] tex = new int[1];
-        GLES30.glGenTextures(1, tex, 0);
+        GLES20.glGenTextures(1, tex, 0);
 
-        GLES30.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES30.glBindTexture(GLES20.GL_TEXTURE_2D, tex[0]);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex[0]);
 
-        GLES30.glTexParameterf(GL10.GL_TEXTURE_2D,
+        GLES20.glTexParameterf(GL10.GL_TEXTURE_2D,
                 GL10.GL_TEXTURE_MAG_FILTER,
                 GL10.GL_LINEAR);
 
-        GLES30.glTexParameterf(GL10.GL_TEXTURE_2D,
+        GLES20.glTexParameterf(GL10.GL_TEXTURE_2D,
                 GL10.GL_TEXTURE_MIN_FILTER,
                 GL10.GL_LINEAR);
 
@@ -258,13 +261,13 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private static int loadShader(int type, String shaderCode){
         // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
         // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-        int shader = GLES30.glCreateShader(type);
+        int shader = GLES20.glCreateShader(type);
 
-        GLES30.glShaderSource(shader, shaderCode);
-        GLES30.glCompileShader(shader);
+        GLES20.glShaderSource(shader, shaderCode);
+        GLES20.glCompileShader(shader);
 
         int[] compiled = new int[1];
-        GLES30.glGetShaderiv(shader, GLES30.GL_COMPILE_STATUS, compiled, 0);	//compile[0] != 0 : compiled successfully
+        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);	//compile[0] != 0 : compiled successfully
         if (compiled[0] == 0) {
             System.out.println("Error compiling shader:");
             System.out.println(shaderCode);
@@ -276,38 +279,38 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     }
 
     private int createShaderProgram(String vShaderSrc, String pShaderSrc){
-        int shader = GLES30.glCreateProgram();
-        GLES30.glAttachShader(shader, loadShader(GLES30.GL_VERTEX_SHADER, vShaderSrc));   // add the vertex shader to program
-        GLES30.glAttachShader(shader, loadShader(GLES30.GL_FRAGMENT_SHADER, pShaderSrc)); // add the fragment shader to program
-        GLES30.glLinkProgram(shader);                                                     // creates OpenGL ES program executables
+        int shader = GLES20.glCreateProgram();
+        GLES20.glAttachShader(shader, loadShader(GLES20.GL_VERTEX_SHADER, vShaderSrc));   // add the vertex shader to program
+        GLES20.glAttachShader(shader, loadShader(GLES20.GL_FRAGMENT_SHADER, pShaderSrc)); // add the fragment shader to program
+        GLES20.glLinkProgram(shader);                                                     // creates OpenGL ES program executables
 
-        GLES30.glUseProgram(shader);
+        GLES20.glUseProgram(shader);
 
         for(int i=0 ; i<_maxTexUnit ; ++i){
-            int samplerLoc = GLES30.glGetUniformLocation (shader, "texture["+i+"]" );
+            int samplerLoc = GLES20.glGetUniformLocation (shader, "texture["+i+"]" );
             if(samplerLoc >= 0)
-                GLES30.glUniform1i ( samplerLoc, i);
+                GLES20.glUniform1i ( samplerLoc, i);
         }
 
 
-        GLES30.glUseProgram(0);
+        GLES20.glUseProgram(0);
         return shader;
     }
 
     private int createTexture(int w, int h, int internal){
         int id[] = new int[1];
-        GLES30.glGenTextures(1, id, 0);
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, id[0]);
+        GLES20.glGenTextures(1, id, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, id[0]);
         // Width and height do not have to be a power of two
-        GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA,
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
                 w, h,
-                0, internal, GLES30.GL_UNSIGNED_BYTE, null);
+                0, internal, GLES20.GL_UNSIGNED_BYTE, null);
 
-        GLES30.glTexParameterf(GL10.GL_TEXTURE_2D,
+        GLES20.glTexParameterf(GL10.GL_TEXTURE_2D,
                 GL10.GL_TEXTURE_MAG_FILTER,
                 GL10.GL_LINEAR);
 
-        GLES30.glTexParameterf(GL10.GL_TEXTURE_2D,
+        GLES20.glTexParameterf(GL10.GL_TEXTURE_2D,
                 GL10.GL_TEXTURE_MIN_FILTER,
                 GL10.GL_LINEAR);
 
