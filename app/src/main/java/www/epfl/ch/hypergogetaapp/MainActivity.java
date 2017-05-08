@@ -1,35 +1,22 @@
 package www.epfl.ch.hypergogetaapp;
 
+
+import wseemann.media.FFmpegMediaMetadataRetriever;
+
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.widget.SeekBar;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
-import static android.media.MediaMetadataRetriever.OPTION_CLOSEST;
-import static java.lang.Integer.parseInt;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize media retriever
         retriever = new MediaMetadataRetriever();
+        //retriever = new FFmpegMediaMetadataRetriever();
         showFileChooser();
 
         ImageView imgViewFirstFrame = (ImageView) findViewById(R.id.imageViewFirstFrame);
@@ -72,6 +60,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 editTextFirstFrame.setText(String.valueOf(progress));
+
+
+                // Use this for interactive update
+                long value = seekBar.getProgress();
+                if (value <= frameManager.loadingProgressionPreview) {
+                    frameManager.changeFirstFrame(seekBar.getProgress());
+                }
+
+                if(value <= frameManager.loadingProgression) {
+                    editTextFirstFrame.setBackgroundColor(0x9900FF00);
+                } else if (value <= frameManager.loadingProgressionPreview){
+                    editTextFirstFrame.setBackgroundColor(0x99AAFFAA);
+                } else {
+                    editTextFirstFrame.setBackgroundColor(0x99AA0000);
+                }
             }
 
             @Override
@@ -81,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                frameManager.changeFirstFrame(seekBar.getProgress());
+                // Use this for updating frame only when we release the slider
+                //frameManager.changeFirstFrame(seekBar.getProgress());
             }
         });
 
@@ -199,7 +203,9 @@ public class MainActivity extends AppCompatActivity {
     private Uri videoUri;
 
     // Handle the video
+
     private MediaMetadataRetriever retriever;
+    //private FFmpegMediaMetadataRetriever retriever;
     private VideoRenderer videoRenderer;
     private FrameManager frameManager;
 }
