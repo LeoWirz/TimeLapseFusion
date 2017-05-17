@@ -18,6 +18,10 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import static android.R.attr.max;
+import static android.R.attr.maxButtonHeight;
+import static android.os.Build.VERSION_CODES.M;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,12 +94,12 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for window size
         final SeekBar seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
         seekBarWindowSize.setMax(MAX_WINDOW_SIZE);
-        final TextView texViewtWindowSize = (TextView)findViewById(R.id.textTextWindowSize);
+        final TextView editTextWindowSize = (TextView)findViewById(R.id.editTextWindowSize);
 
         seekBarWindowSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                texViewtWindowSize.setText(String.valueOf(progress));
+                editTextWindowSize.setText(String.valueOf(progress));
             }
 
             @Override
@@ -108,6 +112,174 @@ public class MainActivity extends AppCompatActivity {
                 frameManager.changeWindowSize(seekBar.getProgress());
             }
         });
+
+        editTextWindowSize.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > MAX_WINDOW_SIZE){
+                    value = MAX_WINDOW_SIZE;
+                    editTextWindowSize.setText(String.valueOf(value));
+                }
+
+                seekBarWindowSize.setProgress(value);
+                frameManager.changeWindowSize(value);
+                return true;
+            }
+        });
+        
+
+        //seekbar for sigma
+        final SeekBar seekBarSigma = (SeekBar)findViewById(R.id.seekBarSigma);
+        seekBarSigma.setMax(MAX_SIGMA_VALUE);
+        final EditText editTextSigma = (EditText)findViewById(R.id.editTextSigma);
+
+        seekBarSigma.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                editTextSigma.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                frameManager.changeWindowSize(seekBar.getProgress());
+            }
+        });
+
+        editTextSigma.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > MAX_SIGMA_VALUE){
+                    value = MAX_SIGMA_VALUE;
+                    editTextSigma.setText(String.valueOf(value));
+                }
+
+                seekBarSigma.setProgress(value);
+                frameManager.changeWindowSize(value);
+                return true;
+            }
+        });
+
+
+        //seekbar for sigma C
+        final SeekBar seekBarAlphaC = (SeekBar)findViewById(R.id.seekBarAlphaC);
+        seekBarAlphaC.setMax(MAX_ALPHA_VALUE);
+        final EditText editTextAlphaC = (EditText)findViewById(R.id.editTextAlphaC);
+
+        seekBarAlphaC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                editTextAlphaC.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                frameManager.changeWindowSize(seekBar.getProgress());
+            }
+        });
+
+        editTextAlphaC.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > MAX_ALPHA_VALUE){
+                    value = MAX_ALPHA_VALUE;
+                    editTextAlphaC.setText(String.valueOf(value));
+                }
+
+                seekBarAlphaC.setProgress(value);
+                frameManager.changeWindowSize(value);
+                return true;
+            }
+        });
+
+
+        //seekbar for sigma E
+        final SeekBar seekBarAlphaE = (SeekBar)findViewById(R.id.seekBarAlphaE);
+        seekBarAlphaE.setMax(MAX_ALPHA_VALUE);
+        final EditText editTextAlphaE = (EditText)findViewById(R.id.editTextAlphaE);
+
+        seekBarAlphaE.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                editTextAlphaE.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                frameManager.changeWindowSize(seekBar.getProgress());
+            }
+        });
+
+        editTextAlphaE.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > MAX_ALPHA_VALUE){
+                    value = MAX_ALPHA_VALUE;
+                    editTextAlphaE.setText(String.valueOf(value));
+                }
+
+                seekBarAlphaE.setProgress(value);
+                frameManager.changeWindowSize(value);
+                return true;
+            }
+        });
+
+
+        //seekbar for sigma S
+        final SeekBar seekBarAlphaS = (SeekBar)findViewById(R.id.seekBarAlphaS);
+        seekBarAlphaS.setMax(MAX_ALPHA_VALUE);
+        final EditText editTextAlphaS = (EditText)findViewById(R.id.editTextAlphaS);
+
+        seekBarAlphaS.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                editTextAlphaS.setText(String.valueOf(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                frameManager.changeWindowSize(seekBar.getProgress());
+            }
+        });
+
+        editTextAlphaS.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int value = Integer.parseInt(v.getText().toString());
+                if(value > MAX_ALPHA_VALUE){
+                    value = MAX_ALPHA_VALUE;
+                    editTextAlphaS.setText(String.valueOf(value));
+                }
+
+                seekBarAlphaS.setProgress(value);
+                frameManager.changeWindowSize(value);
+                return true;
+            }
+        });
+
     }
 
     // Not important
