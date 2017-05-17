@@ -22,6 +22,10 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     final static int MAX_WINDOW_SIZE = 8;
+    // TODO this depends on the video
+    final static int MAX_FRAME_NUMBER = 100;
+    final static int MAX_ALPHA_VALUE = 1;
+    final static int MAX_SIGMA_VALUE = 30;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
