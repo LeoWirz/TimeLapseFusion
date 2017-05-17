@@ -16,137 +16,251 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:weightSum="1">
 
         <android.opengl.GLSurfaceView
             android:id="@+id/glView"
-            android:layout_width="280dp"
-            android:layout_height="200dp"
-            android:layout_weight="0.01"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.512"
-            app:layout_constraintVertical_bias="0.498" />
-
-        <TextView
-            android:id="@+id/textViewSliderFirstFrame"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="First frame" />
+            android:layout_height="230dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="5dp"
-            android:layout_weight="0.1"
-            android:orientation="horizontal">
-
-            <SeekBar
-                android:id="@+id/seekBarFirstFrame"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="5" />
-
-            <TextView
-                android:id="@+id/textViewFirstFrame"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="0"/>
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/textViewSliderWindowSize"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:text="Window size" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="5dp"
-            android:layout_weight="0.1"
-            android:orientation="horizontal">
-
-            <SeekBar
-                android:id="@+id/seekBarWindowSize"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="5" />
-
-            <TextView
-                android:id="@+id/textTextWindowSize"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="0" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_weight="0.08"
-            android:orientation="horizontal">
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <TextView
-                    android:id="@+id/textViewFirstFrameLabel"
+                    android:id="@+id/textViewSliderFirstFrame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_weight="0.1"
                     android:gravity="center"
                     android:text="First frame" />
 
-                <ImageView
-                    android:id="@+id/imageViewFirstFrame"
-                    android:layout_width="wrap_content"
-                    android:layout_height="150dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
                     android:layout_marginTop="5dp"
-                    android:layout_weight="0.5" />
-            </LinearLayout>
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                    <SeekBar
+                        android:id="@+id/seekBarFirstFrame"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5" />
+
+                    <TextView
+                        android:id="@+id/textViewFirstFrame"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="0" />
+                </LinearLayout>
+
                 <TextView
-                    android:id="@+id/textViewLastFrameLabel"
+                    android:id="@+id/textViewSliderWindowSize"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:gravity="center"
-                    android:text="Last frame" />
-
-                <ImageView
-                    android:id="@+id/imageViewLastFrame"
-                    android:layout_width="wrap_content"
-                    android:layout_height="150dp"
                     android:layout_marginTop="5dp"
-                    android:layout_weight="0.5" />
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Window size" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarWindowSize"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5" />
+
+                    <TextView
+                        android:id="@+id/editTextWindowSize"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="0" />
+                </LinearLayout>
+
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Sigma" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarSigma"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5" />
+
+                    <EditText
+                        android:id="@+id/editTextSigma"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Alphas" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarAlphaC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5" />
+
+                    <EditText
+                        android:id="@+id/editTextAlphaC"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarAlphaS"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5" />
+
+                    <EditText
+                        android:id="@+id/editTextAlphaS"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarAlphaE"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="5" />
+
+                    <EditText
+                        android:id="@+id/editTextAlphaE"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="0.08"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textViewFirstFrameLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_weight="0.1"
+                            android:gravity="center"
+                            android:text="First frame" />
+
+                        <ImageView
+                            android:id="@+id/imageViewFirstFrame"
+                            android:layout_width="wrap_content"
+                            android:layout_height="150dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_weight="0.5" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textViewLastFrameLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_weight="0.1"
+                            android:gravity="center"
+                            android:text="Last frame" />
+
+                        <ImageView
+                            android:id="@+id/imageViewLastFrame"
+                            android:layout_width="wrap_content"
+                            android:layout_height="150dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_weight="0.5" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </LinearLayout>
-        </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 
