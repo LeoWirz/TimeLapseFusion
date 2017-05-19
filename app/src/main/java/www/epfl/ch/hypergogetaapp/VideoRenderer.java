@@ -103,6 +103,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         }
     }
 
+    public void setBrightness(float b) {}
+    public void setContrast(float b) {}
+
     public void setWindowSize(int size) {
         _windowSize = size;
     }
