@@ -4,6 +4,8 @@ package www.epfl.ch.hypergogetaapp;
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 import static android.R.attr.max;
 import static android.R.attr.maxButtonHeight;
 import static android.os.Build.VERSION_CODES.M;
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -228,6 +231,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
         showFileChooser();
+        view.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // launch mask activity
+                Intent intent = new Intent(MainActivity.this, MaskActivity.class);
+
+                //TODO get image
+                //Bitmap image = ((BitmapDrawable)imgViewFirstFrame.getDrawable()).getBitmap();
+
+                //intent.putExtra("imagebitmap", image);
+
+                startActivity(intent);
+            }
+        });
+
     }
 
     // Not important
