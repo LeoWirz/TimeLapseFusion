@@ -122,12 +122,12 @@
                         android:layout_height="match_parent"
                         android:layout_weight="5" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/editTextSigma"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:inputType="number" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <TextView
@@ -152,12 +152,12 @@
                         android:layout_height="match_parent"
                         android:layout_weight="5" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/editTextAlphaC"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:inputType="number" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -173,12 +173,12 @@
                         android:layout_height="match_parent"
                         android:layout_weight="5" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/editTextAlphaS"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:inputType="number" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -194,12 +194,12 @@
                         android:layout_height="match_parent"
                         android:layout_weight="5" />
 
-                    <EditText
+                    <TextView
                         android:id="@+id/editTextAlphaE"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:inputType="number" />
+                        android:text="0" />
                 </LinearLayout>
 
                 <LinearLayout

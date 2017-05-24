@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     final static int MAX_WINDOW_SIZE = 8;
     // TODO this depends on the video
     final static int MAX_FRAME_NUMBER = 100;
-    final static int MAX_ALPHA_VALUE = 1;
+    final static int MAX_ALPHA_VALUE = 100;
     final static int MAX_SIGMA_VALUE = 30;
 
     @Override
@@ -57,14 +57,7 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for first frame
         seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
 
-<<<<<<< HEAD
         final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
-=======
-        // TODO find out number of frames in the video
-        seekBarFirstFrame.setMax(MAX_FRAME_NUMBER);
-
-        final TextView editTextFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
->>>>>>> activity-main prepared for rebase
 
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -139,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for sigma
         final SeekBar seekBarSigma = (SeekBar)findViewById(R.id.seekBarSigma);
         seekBarSigma.setMax(MAX_SIGMA_VALUE);
-        final EditText editTextSigma = (EditText)findViewById(R.id.editTextSigma);
+        final TextView editTextSigma = (TextView)findViewById(R.id.editTextSigma);
 
         seekBarSigma.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -177,12 +170,13 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for sigma C
         final SeekBar seekBarAlphaC = (SeekBar)findViewById(R.id.seekBarAlphaC);
         seekBarAlphaC.setMax(MAX_ALPHA_VALUE);
-        final EditText editTextAlphaC = (EditText)findViewById(R.id.editTextAlphaC);
+        final TextView editTextAlphaC = (TextView)findViewById(R.id.editTextAlphaC);
 
         seekBarAlphaC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                editTextAlphaC.setText(String.valueOf(progress));
+                Double p = (double)progress;
+                editTextAlphaC.setText(String.valueOf(p/100));
             }
 
             @Override
@@ -215,12 +209,13 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for sigma E
         final SeekBar seekBarAlphaE = (SeekBar)findViewById(R.id.seekBarAlphaE);
         seekBarAlphaE.setMax(MAX_ALPHA_VALUE);
-        final EditText editTextAlphaE = (EditText)findViewById(R.id.editTextAlphaE);
+        final TextView editTextAlphaE = (TextView)findViewById(R.id.editTextAlphaE);
 
         seekBarAlphaE.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                editTextAlphaE.setText(String.valueOf(progress));
+                Double p = (double)progress;
+                editTextAlphaE.setText(String.valueOf(p/100));
             }
 
             @Override
@@ -253,12 +248,13 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for sigma S
         final SeekBar seekBarAlphaS = (SeekBar)findViewById(R.id.seekBarAlphaS);
         seekBarAlphaS.setMax(MAX_ALPHA_VALUE);
-        final EditText editTextAlphaS = (EditText)findViewById(R.id.editTextAlphaS);
+        final TextView editTextAlphaS = (TextView)findViewById(R.id.editTextAlphaS);
 
         seekBarAlphaS.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                editTextAlphaS.setText(String.valueOf(progress));
+                Double p = (double)progress;
+                editTextAlphaS.setText(String.valueOf(p/100));
             }
 
             @Override
