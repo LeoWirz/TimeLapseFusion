@@ -39,17 +39,17 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onDrawFrame(GL10 unused) {
-        GLES20.glClearColor(1,0,0,1);
+        /*GLES20.glClearColor(1,0,0,1);
         GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        return;
-/*
+        return;*/
+
         Bitmap toUpload = null;
         synchronized (_bitmaps) {
             toUpload = _bitmaps.poll();
         }
 
         if(toUpload != null){
-            Log.d("VR_TAG", "1 fromae to upload ");
+            Log.d("VR_TAG", "1 frame to upload ");
             _glTextures.add(new int[1]);
             _glTextures.get(_glTextures.size()-1)[0] = uploadBitmap(toUpload);
 
@@ -59,7 +59,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
                 _dummyTexture = new int[1];
                 _dummyTexture[0] = createTexture(toUpload.getWidth(), toUpload.getHeight(), GLES20.GL_RGBA);
             }
-
+            checkGLError("upload");
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, _frameBuffer[0]);
             GLES20.glViewport(0, 0, toUpload.getWidth(), toUpload.getHeight());
 
@@ -71,6 +71,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
             GLES20.glViewport(0, 0, _winWidth, _winHeight);
+
+            checkGLError("end upload");
         }
 
         if(_needClear){
@@ -85,7 +87,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             _bluredTextures.clear();
         }
 
-        render();*/
+        render();
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -157,16 +159,22 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             return;
         }
         else{
-            Log.d("VR_TAG", "Nb texture " +  _glTextures.size());
-            GLES20.glUseProgram(_renderVideoShader);
-            GLES20.glUniform1i(_nbTextureLocation, min(_glTextures.size(), _maxTexUnit / 2));
+            int numTexToUse = min(min(_glTextures.size(), _windowSize), _maxTexUnit / 2);
 
-            int texs[] = new int[min(_glTextures.size(), _maxTexUnit / 2) * 2];
+            Log.d("VR_TAG", "Nb texture to use " +  numTexToUse);
+
+            if(numTexToUse == 0)
+                return;
+
+            GLES20.glUseProgram(_renderVideoShader);
+            GLES20.glUniform1i(_nbTextureLocation, numTexToUse);
+
+            int texs[] = new int[numTexToUse*2];
 
             //System.out.print("windowesize:"+_windowSize + "   ");
             //System.out.println((_glTextures.size()-min(_glTextures.size(), _maxTexUnit / 2)) + " to " + _glTextures.size());
 
-            for(int i=_glTextures.size()-min(_glTextures.size(), _maxTexUnit / 2) ; i<_glTextures.size() ; ++i){
+            for(int i=0 ; i<numTexToUse ; ++i){
                 texs[i*2] = _glTextures.get(i)[0];
                 texs[i*2+1] = _bluredTextures.get(i)[0];
             }
@@ -192,6 +200,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + i);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[i]);
         }
+
+        checkGLError("render1");
 
         /*************************/
         /* Setup attrib location */
@@ -227,6 +237,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         if(texCoordAttribLocation >= 0)
             GLES20.glDisableVertexAttribArray(texCoordAttribLocation);
 
+        checkGLError("render2");
     }
 
     private int uploadBitmap(Bitmap bitmap){
@@ -393,6 +404,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "}\n" +
 
             "void main(){ \n" +
+            "if(nbTexture == 1){ \n" +
+            "   gl_FragColor = texture2D( texture[0], v_texCoord ); return; }\n" +
             "float exp_c = 0.2, exp_s = 0.2, exp_e = 0.2;\n" +
             "vec4 finalColor = vec4(0,0,0,0);\n" +
             "float finalWeight = 0.0;\n" +
