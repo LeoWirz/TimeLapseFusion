@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 buttonPlay.setText("Play");
+                seekBarFirstFrame.setEnabled(true);
+                seekBarWindowSize.setEnabled(true);
             }
         });
     }
@@ -73,10 +75,14 @@ public class MainActivity extends AppCompatActivity {
                     isPlaying = true;
                     frameManager.play();
                     buttonPlay.setText("Pause");
+                    seekBarFirstFrame.setEnabled(false);
+                    seekBarWindowSize.setEnabled(false);
                 } else {
                     isPlaying = false;
                     frameManager.pause();
                     buttonPlay.setText("Play");
+                    seekBarFirstFrame.setEnabled(true);
+                    seekBarWindowSize.setEnabled(true);
                 }
             }
         });
@@ -118,13 +124,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //seekbar for window size
-        final SeekBar seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
-        seekBarWindowSize.setMax(MAX_WINDOW_SIZE);
+        seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
+        seekBarWindowSize.setMax(MAX_WINDOW_SIZE-1);
         final TextView editTextWindowSize = (TextView)findViewById(R.id.editTextWindowSize);
 
         seekBarWindowSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                progress++;
                 editTextWindowSize.setText(String.valueOf(progress));
                 frameManager.changeWindowSize(seekBar.getProgress());
             }
@@ -297,6 +304,7 @@ public class MainActivity extends AppCompatActivity {
     private FrameManager frameManager;
 
     private SeekBar seekBarFirstFrame;
+    private SeekBar seekBarWindowSize;
     private Button buttonPlay;
 
     private Boolean isPlaying;
