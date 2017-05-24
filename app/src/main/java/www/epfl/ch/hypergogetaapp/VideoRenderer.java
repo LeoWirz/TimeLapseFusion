@@ -110,6 +110,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
     public void setBrightness(float b) {}
     public void setContrast(float b) {}
+    public void setExpC(float x) {}
+    public void setExpS(float x) {}
+    public void setExpE(float x) {}
 
     public void setWindowSize(int size) {
         _windowSize = size;
@@ -410,7 +413,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "   finalColor += color*weight;\n" +
             "}\n" +
             "   gl_FragColor = finalColor / finalWeight; \n" +
-            "}";
+            "}" +
+            "\n" +
+            "";
 
     private static int KERNEL_SIZE = 41;
     private static final String pixelHBlurShader_src =
