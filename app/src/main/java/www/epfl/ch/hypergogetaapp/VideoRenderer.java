@@ -29,18 +29,20 @@ import static java.lang.Math.min;
 public class VideoRenderer implements GLSurfaceView.Renderer {
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
+        Log.d("Enter init ", "OK");
         init();
 
         int n[] = new int[1];
         GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, n,0);
         _maxTexUnit = n[0];
+        checkGLError("GetUniform");
     }
 
     public void onDrawFrame(GL10 unused) {
-        /*GLES20.glClearColor(1,0,0,1);
+        GLES20.glClearColor(1,0,0,1);
         GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
-        return;*/
-
+        return;
+/*
         Bitmap toUpload = null;
         synchronized (_bitmaps) {
             toUpload = _bitmaps.poll();
@@ -83,7 +85,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             _bluredTextures.clear();
         }
 
-        render();
+        render();*/
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -132,17 +134,21 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _uvBuffer = createBuffer(uv);
         _vertexBuffer = createBuffer(position);
         _indexBuffer = createBuffer(indexes);
-
+        checkGLError("CreateBuffer");
         _renderVideoShader = createShaderProgram(vertexShader_src, pixelShader_src);
+        checkGLError("CreateShader1");
         _HBlurShader = createShaderProgram(vertexShader_src, pixelHBlurShader_src);
+        checkGLError("CreateShader2");
         _VBlurShader = createShaderProgram(vertexShader_src, pixelVBlurShader_src);
-
+        checkGLError("CreateShader3");
         _nbTextureLocation = GLES20.glGetUniformLocation(_renderVideoShader, "nbTexture");
 
         GLES20.glGenFramebuffers(1, _frameBuffer, 0);
 
         GLES20.glDisable(GL10.GL_DEPTH_TEST);
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+        checkGLError("EndInit");
+        Log.d("Init ", "OK");
     }
 
     private void render(){
@@ -275,11 +281,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
         int[] compiled = new int[1];
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);	//compile[0] != 0 : compiled successfully
-        if (compiled[0] == 0) {
-            System.out.println("Error compiling shader:");
-            System.out.println(shaderCode);
-            System.out.println("----> Error:");
-            System.out.println(GLES20.glGetShaderInfoLog(shader));
+        if (compiled[0] != GLES20.GL_TRUE) {
+            Log.d("Error compiling shader:", GLES20.glGetShaderInfoLog(shader));
         }
 
         return shader;
@@ -290,6 +293,12 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         GLES20.glAttachShader(shader, loadShader(GLES20.GL_VERTEX_SHADER, vShaderSrc));   // add the vertex shader to program
         GLES20.glAttachShader(shader, loadShader(GLES20.GL_FRAGMENT_SHADER, pShaderSrc)); // add the fragment shader to program
         GLES20.glLinkProgram(shader);                                                     // creates OpenGL ES program executables
+
+        int[] linked = new int[1];
+        GLES20.glGetProgramiv(shader, GLES20.GL_LINK_STATUS, linked, 0);	//compile[0] != 0 : compiled successfully
+        if (linked[0] != GLES20.GL_TRUE) {
+            Log.d("Error linking shader:", GLES20.glGetProgramInfoLog(shader));
+        }
 
         GLES20.glUseProgram(shader);
 
@@ -324,6 +333,17 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         return id[0];
     }
 
+    public void checkGLError(String op) {
+        int error;
+        int numError=0;
+        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+            Log.d("GLError!! ", op + ": glError " + error);
+            numError++;
+        }
+        if(numError > 0)
+            System.exit(-1);
+    }
+
     private Queue<Bitmap> _bitmaps = new ArrayDeque<Bitmap>();
     private List<int[]> _glTextures = new ArrayList<int[]>();
     private List<int[]> _bluredTextures = new ArrayList<int[]>();
@@ -353,7 +373,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
     private static final String pixelShader_src =
             "precision highp float; \n" +
-            "uniform sampler2D texture[32]; \n" +
+            "uniform sampler2D texture[16]; \n" +
             "uniform int nbTexture; \n" +
             "varying vec2 v_texCoord; \n" +
 
