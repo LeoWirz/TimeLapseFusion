@@ -49,7 +49,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         }
 
         if(toUpload != null){
-            Log.d("VR_TAG", "1 frame to upload ");
             _glTextures.add(new int[1]);
             _glTextures.get(_glTextures.size()-1)[0] = uploadBitmap(toUpload);
 
@@ -59,7 +58,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
                 _dummyTexture = new int[1];
                 _dummyTexture[0] = createTexture(toUpload.getWidth(), toUpload.getHeight(), GLES20.GL_RGBA);
             }
-            checkGLError("upload");
+
+            checkGLError("Upload");
+
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, _frameBuffer[0]);
             GLES20.glViewport(0, 0, toUpload.getWidth(), toUpload.getHeight());
 
@@ -71,8 +72,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
             GLES20.glViewport(0, 0, _winWidth, _winHeight);
-
-            checkGLError("end upload");
         }
 
         if(_needClear){
@@ -99,7 +98,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     public void addFrame(Bitmap bitmap) {
         synchronized (_bitmaps) {
             _bitmaps.add(bitmap);
-            Log.d("VR_TAG", "add bitmap");
         }
     }
 
@@ -137,6 +135,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _vertexBuffer = createBuffer(position);
         _indexBuffer = createBuffer(indexes);
         checkGLError("CreateBuffer");
+
         _renderVideoShader = createShaderProgram(vertexShader_src, pixelShader_src);
         checkGLError("CreateShader1");
         _HBlurShader = createShaderProgram(vertexShader_src, pixelHBlurShader_src);
@@ -150,18 +149,14 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         GLES20.glDisable(GL10.GL_DEPTH_TEST);
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
         checkGLError("EndInit");
-        Log.d("Init ", "OK");
     }
 
     private void render(){
-
         if(_glTextures.isEmpty()){
             return;
         }
         else{
             int numTexToUse = min(min(_glTextures.size(), _windowSize), _maxTexUnit / 2);
-
-            Log.d("VR_TAG", "Nb texture to use " +  numTexToUse);
 
             if(numTexToUse == 0)
                 return;
@@ -170,9 +165,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             GLES20.glUniform1i(_nbTextureLocation, numTexToUse);
 
             int texs[] = new int[numTexToUse*2];
-
-            //System.out.print("windowesize:"+_windowSize + "   ");
-            //System.out.println((_glTextures.size()-min(_glTextures.size(), _maxTexUnit / 2)) + " to " + _glTextures.size());
 
             for(int i=0 ; i<numTexToUse ; ++i){
                 texs[i*2] = _glTextures.get(i)[0];
@@ -196,12 +188,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private void render(int shader, int textures[]) {
         GLES20.glUseProgram(shader);
 
-        for(int i=0 ; i<textures.length ; ++i){
+        for(int i=0 ; i<textures.length ; ++i) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + i);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[i]);
         }
-
-        checkGLError("render1");
 
         /*************************/
         /* Setup attrib location */
@@ -236,8 +226,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             GLES20.glDisableVertexAttribArray(vertexAttribLocation);
         if(texCoordAttribLocation >= 0)
             GLES20.glDisableVertexAttribArray(texCoordAttribLocation);
-
-        checkGLError("render2");
     }
 
     private int uploadBitmap(Bitmap bitmap){
@@ -430,7 +418,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "uniform sampler2D texture[1]; \n" +
             "varying vec2 v_texCoord; \n" +
             "#define KERNEL_SIZE "+KERNEL_SIZE+"\n" +
-            "const float STEP = 1.0/720.0;\n" +
+            "const float STEP = 1.0/480.0;\n" +
             "void main(){ \n" +
             "   float KERNEL[KERNEL_SIZE];\n" +
             "   for(int i=0 ; i<KERNEL_SIZE ; ++i) KERNEL[i] = 1.0/float(KERNEL_SIZE);\n" +
@@ -442,7 +430,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "uniform sampler2D texture[1]; \n" +
             "varying vec2 v_texCoord; \n" +
             "#define KERNEL_SIZE "+KERNEL_SIZE+"\n" +
-            "const float STEP = 1.0/405.0;\n" +
+            "const float STEP = 1.0/260.0;\n" +
             "void main(){ \n" +
             "   float KERNEL[KERNEL_SIZE];\n" +
             "   for(int i=0 ; i<KERNEL_SIZE ; ++i) KERNEL[i] = 1.0/float(KERNEL_SIZE);\n" +
