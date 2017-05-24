@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 long value = seekBar.getProgress() * frameManager.maxNumFrame / 100;
                 textViewFirstFrame.setText(Long.toString(value));
                 if (value <= frameManager.loadingProgression) {
-                    frameManager.changeFirstFrame((int)value);
+                    frameManager.changeFrameOnScroll((int)value);
                 }
 
                 if(value <= frameManager.loadingProgression) {
@@ -87,7 +87,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 // Use this for updating frame only when we release the slider
-                //frameManager.changeFirstFrame(seekBar.getProgress());
+                long value = seekBar.getProgress() * frameManager.maxNumFrame / 100;
+                if (value <= frameManager.loadingProgression) {
+                    frameManager.changeFrameOnStop((int)value);
+                }
             }
         });
 

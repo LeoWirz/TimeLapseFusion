@@ -38,13 +38,10 @@ public class FrameManager {
         return frame;
     }
 
-    public void changeFirstFrame(int newFirstFrame) {
-        // Read the frame number in the text field
-        firstFrame = newFirstFrame;
-
+    private void updateGuides(int idx) {
         // Retrieve the frame from the video (time in micro seconds)
-        Bitmap bmpFirstFrame = getFrameAt(firstFrame);
-        Bitmap bmpLastFrame  = getFrameAt(firstFrame + windowSize);
+        Bitmap bmpFirstFrame = getFrameAt(idx);
+        Bitmap bmpLastFrame  = getFrameAt(idx + windowSize);
 
         // Display the frame
         if(bmpFirstFrame != null)
@@ -52,6 +49,26 @@ public class FrameManager {
 
         if(bmpLastFrame != null)
             imgViewLastFrame.setImageBitmap(bmpLastFrame);
+    }
+
+    // add only the current frame and render this frame only (also update the guides)
+    public void changeFrameOnScroll(int newFirstFrame) {
+        // Read the frame number in the text field
+        firstFrame = newFirstFrame;
+
+        updateGuides(firstFrame);
+
+        // update content on VideoRenderer
+        vr.clear();
+        vr.addFrame(getFrameAt(firstFrame));
+    }
+
+    // Add all the window of frames and render
+    public void changeFrameOnStop(int newFirstFrame) {
+        // Read the frame number in the text field
+        firstFrame = newFirstFrame;
+
+        updateGuides(firstFrame);
 
         // update content on VideoRenderer
         vr.clear();
@@ -72,15 +89,19 @@ public class FrameManager {
                 if (frame != null)
                     vr.addFrame(frame);
             }
+        } else {
+            vr.clear();
+            for (int i = 0; i < newWindowSize; i++) {
+                Bitmap frame = getFrameAt(firstFrame + i);
+                if (frame != null)
+                    vr.addFrame(frame);
+            }
         }
 
         windowSize = newWindowSize;
         vr.setWindowSize(newWindowSize);
 
-        // Display the frame
-        Bitmap bmpLastFrame = getFrameAt(firstFrame + windowSize);
-        if(bmpLastFrame != null)
-            imgViewLastFrame.setImageBitmap(bmpLastFrame);
+        updateGuides(firstFrame);
     }
 
     public void setDataSource(Context ctx, Uri uri) {
