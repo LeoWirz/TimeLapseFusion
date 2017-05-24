@@ -35,7 +35,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         int n[] = new int[1];
         GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, n,0);
         _maxTexUnit = n[0];
-        checkGLError("GetUniform");
+        checkGLError("End Init");
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -110,9 +110,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
     public void setBrightness(float b) {}
     public void setContrast(float b) {}
-    public void setExpC(float x) {}
-    public void setExpS(float x) {}
-    public void setExpE(float x) {}
+    public void setExpC(float x) { _expC = x; }
+    public void setExpS(float x) { _expS = x; }
+    public void setExpE(float x) { _expE = x; }
+    public void setSigma(float x) { _sigma = x; }
 
     public void setWindowSize(int size) {
         _windowSize = size;
@@ -146,6 +147,15 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _VBlurShader = createShaderProgram(vertexShader_src, pixelVBlurShader_src);
         checkGLError("CreateShader3");
         _nbTextureLocation = GLES20.glGetUniformLocation(_renderVideoShader, "nbTexture");
+        _expC_loc = GLES20.glGetUniformLocation(_renderVideoShader, "expC");
+        _expS_loc = GLES20.glGetUniformLocation(_renderVideoShader, "expS");
+        _expE_loc = GLES20.glGetUniformLocation(_renderVideoShader, "expE");
+        _sigma_loc = GLES20.glGetUniformLocation(_renderVideoShader, "sigma");
+
+        if(_expC_loc < 0 || _expS_loc < 0 || _expE_loc < 0 || _sigma_loc < 0) {
+            Log.d("Uniform exp? ", " not found");
+            System.exit(-1);
+        }
 
         GLES20.glGenFramebuffers(1, _frameBuffer, 0);
 
@@ -166,6 +176,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
             GLES20.glUseProgram(_renderVideoShader);
             GLES20.glUniform1i(_nbTextureLocation, numTexToUse);
+            GLES20.glUniform1f(_expC_loc, _expC);
+            GLES20.glUniform1f(_expS_loc, _expS);
+            GLES20.glUniform1f(_expE_loc, _expE);
+            GLES20.glUniform1f(_sigma_loc, _sigma);
 
             int texs[] = new int[numTexToUse*2];
 
@@ -362,6 +376,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private int _renderVideoShader = -1, _nbTextureLocation=-1;
     private int _HBlurShader = -1, _VBlurShader = -1;
 
+    private float _expC  = 0.2f, _expS = 0.2f, _expE = 0.2f, _sigma = 0.7f;
+    private int _expC_loc, _expS_loc, _expE_loc, _sigma_loc;
+
     private int _winWidth=0, _winHeight=0;
 
     private static final String vertexShader_src =
@@ -379,6 +396,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "uniform int nbTexture; \n" +
             "varying vec2 v_texCoord; \n" +
 
+            "uniform float expC, expS, expE, sigma; \n" +
+
             "float toGrey(vec3 c){ return c.r*0.299+c.g*0.587+c.b*0.114; }\n" +
 
             "float exposdness(vec3 c){ return exp(-(c.r-0.5)*(c.r-0.5) / (2.0*0.2*0.2)) *\n" +
@@ -391,22 +410,22 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "}\n" +
 
             "float timeDecay(int frame){\n" +
-            "   return exp(-float(frame*frame)*0.00175 / (2.0*0.2*0.2));\n" +
+            "   //return exp(-float(frame*frame)*0.00175 / (2.0*0.2*0.2));\n" +
+            "   return pow(sigma, float(frame));\n" +
             "}\n" +
 
             "void main(){ \n" +
             "if(nbTexture == 1){ \n" +
             "   gl_FragColor = texture2D( texture[0], v_texCoord ); return; }\n" +
-            "float exp_c = 0.2, exp_s = 0.2, exp_e = 0.2;\n" +
             "vec4 finalColor = vec4(0,0,0,0);\n" +
             "float finalWeight = 0.0;\n" +
             "vec4 color=vec4(0,0,0,1);\n" +
             "for(int i=0 ; i<nbTexture ; ++i){\n" +
             "   color = texture2D( texture[i*2], v_texCoord );\n" +
             "   vec4 laplace = texture2D( texture[i*2+1], v_texCoord );\n" +
-            "   float weight = pow(clamp(toGrey(color.rgb-laplace.rgb),0.0,1.0),exp_c);\n" +
-            "   weight *= pow(saturation(color.rgb),exp_s);\n" +
-            "   weight *= pow(exposdness(color.rgb),exp_e);\n" +
+            "   float weight = pow(clamp(toGrey(color.rgb-laplace.rgb),0.0,1.0),expC);\n" +
+            "   weight *= pow(saturation(color.rgb),expS);\n" +
+            "   weight *= pow(exposdness(color.rgb),expE);\n" +
             "   weight += 0.01;\n" +
             "   weight *= timeDecay(nbTexture-1-i);\n" +
             "   finalWeight += weight;\n" +
