@@ -1,9 +1,12 @@
 package www.epfl.ch.hypergogetaapp;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.util.Log;
+
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by SebastienSpeierer on 5/24/2017.
@@ -11,11 +14,14 @@ import android.util.Log;
 
 public class LoadingBGTask extends Thread {
 
-    public LoadingBGTask(FrameManager fm, MediaMetadataRetriever mmr, int min, int max) {
+    public LoadingBGTask(FrameManager fm, Uri u, Context c) {
         this.fm = fm;
-        this.mmr = mmr;
-        this.min = min;
-        this.max = max;
+        uri = u;
+        ctx = c;
+        mmr = new FFmpegMediaMetadataRetriever();
+        mmr.setDataSource(ctx, uri);
+        fm.maxNumFrame = Integer.valueOf(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;
+        Log.d("SS_TAG", "maxNumFrame: " + fm.maxNumFrame);
     }
 
 
@@ -23,26 +29,23 @@ public class LoadingBGTask extends Thread {
         Log.d("SS_TAG", "loadFrameAt: " + frameNumber );
         Bitmap frame = mmr.getFrameAtTime(frameNumber * ((long)1000000 / (long)30), option);
         Log.d("SS_TAG", "-> frame: " + frame);
-        //Bitmap frame = mmr.getFrameAtTime();
         if (frame != null)
             fm.cache.put(frameNumber, frame);
 
         return frame != null;
     }
 
-
-
     public void run() {
+        Log.d("SS_TAG", "min: " + min);
+        Log.d("SS_TAG", "max: " + max);
         // Then load the correct images
-        for (int i = min; i < max; i++) {
-            if (loadFrameAt(i, MediaMetadataRetriever.OPTION_CLOSEST)) {
-                fm.loadingProgression = i;
-            } else {
-                Log.d("SS_TAG", "break");
-                // update slider size
-                fm.maxNumFrame = i - 1;
-                break;
+        for (int i = 0; i < fm.maxNumFrame; i++) {
+            while(!loadFrameAt(i, FFmpegMediaMetadataRetriever.OPTION_CLOSEST)){
+                Log.d("SS_TAG", "try again");
+                mmr = new FFmpegMediaMetadataRetriever();
+                mmr.setDataSource(ctx, uri);
             }
+            fm.loadingProgression = i;
         }
     }
 
@@ -50,5 +53,7 @@ public class LoadingBGTask extends Thread {
     private int min;
     private int max;
     private FrameManager fm;
-    private MediaMetadataRetriever mmr;
+    private FFmpegMediaMetadataRetriever mmr;
+    private Uri uri;
+    private Context ctx;
 }

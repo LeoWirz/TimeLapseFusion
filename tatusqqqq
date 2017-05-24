@@ -1,0 +1,93 @@
+[1mdiff --git a/app/src/main/java/www/epfl/ch/hypergogetaapp/FrameManager.java b/app/src/main/java/www/epfl/ch/hypergogetaapp/FrameManager.java[m
+[1mindex 6af647e..0570899 100644[m
+[1m--- a/app/src/main/java/www/epfl/ch/hypergogetaapp/FrameManager.java[m
+[1m+++ b/app/src/main/java/www/epfl/ch/hypergogetaapp/FrameManager.java[m
+[36m@@ -87,9 +87,10 @@[m [mpublic class FrameManager {[m
+     }[m
+ [m
+     public void setDataSource(Context ctx, Uri uri) {[m
+[31m-        MediaMetadataRetriever mmr1 = new MediaMetadataRetriever();[m
+[32m+[m[32m        //MediaMetadataRetriever mmr1 = new MediaMetadataRetriever();[m
+[32m+[m[32m        FFmpegMediaMetadataRetriever mmr1 = new FFmpegMediaMetadataRetriever();[m
+         mmr1.setDataSource(ctx, uri);[m
+[31m-        maxNumFrame = Integer.valueOf(mmr1.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;[m
+[32m+[m[32m        maxNumFrame = Integer.valueOf(mmr1.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;[m
+ [m
+         LoadingBGTask task = new LoadingBGTask(this, mmr1, 0, maxNumFrame);[m
+         task.start();[m
+[1mdiff --git a/app/src/main/java/www/epfl/ch/hypergogetaapp/LoadingBGTask.java b/app/src/main/java/www/epfl/ch/hypergogetaapp/LoadingBGTask.java[m
+[1mindex 6ada619..1ea2cbc 100644[m
+[1m--- a/app/src/main/java/www/epfl/ch/hypergogetaapp/LoadingBGTask.java[m
+[1m+++ b/app/src/main/java/www/epfl/ch/hypergogetaapp/LoadingBGTask.java[m
+[36m@@ -2,16 +2,17 @@[m [mpackage www.epfl.ch.hypergogetaapp;[m
+ [m
+ import android.graphics.Bitmap;[m
+ import android.media.MediaMetadataRetriever;[m
+[31m-import android.os.AsyncTask;[m
+ import android.util.Log;[m
+ [m
+[32m+[m[32mimport wseemann.media.FFmpegMediaMetadataRetriever;[m
+[32m+[m
+ /**[m
+  * Created by SebastienSpeierer on 5/24/2017.[m
+  */[m
+ [m
+ public class LoadingBGTask extends Thread {[m
+ [m
+[31m-    public LoadingBGTask(FrameManager fm, MediaMetadataRetriever mmr, int min, int max) {[m
+[32m+[m[32m    public LoadingBGTask(FrameManager fm, FFmpegMediaMetadataRetriever mmr, int min, int max) {[m
+         this.fm = fm;[m
+         this.mmr = mmr;[m
+         this.min = min;[m
+[36m@@ -35,7 +36,7 @@[m [mpublic class LoadingBGTask extends Thread {[m
+     public void run() {[m
+         // Then load the correct images[m
+         for (int i = min; i < max; i++) {[m
+[31m-            if (loadFrameAt(i, MediaMetadataRetriever.OPTION_CLOSEST)) {[m
+[32m+[m[32m            if (loadFrameAt(i, FFmpegMediaMetadataRetriever.OPTION_CLOSEST)) {[m
+                 fm.loadingProgression = i;[m
+             } else {[m
+                 Log.d("SS_TAG", "break");[m
+[36m@@ -50,5 +51,5 @@[m [mpublic class LoadingBGTask extends Thread {[m
+     private int min;[m
+     private int max;[m
+     private FrameManager fm;[m
+[31m-    private MediaMetadataRetriever mmr;[m
+[32m+[m[32m    private FFmpegMediaMetadataRetriever mmr;[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/java/www/epfl/ch/hypergogetaapp/VideoRenderer.java b/app/src/main/java/www/epfl/ch/hypergogetaapp/VideoRenderer.java[m
+[1mindex cdce7d8..23cb572 100644[m
+[1m--- a/app/src/main/java/www/epfl/ch/hypergogetaapp/VideoRenderer.java[m
+[1m+++ b/app/src/main/java/www/epfl/ch/hypergogetaapp/VideoRenderer.java[m
+[36m@@ -29,7 +29,7 @@[m [mimport static java.lang.Math.min;[m
+ public class VideoRenderer implements GLSurfaceView.Renderer {[m
+ [m
+     public void onSurfaceCreated(GL10 unused, EGLConfig config) {[m
+[31m-        init();[m
+[32m+[m[32m        //init();[m
+ [m
+         int n[] = new int[1];[m
+         GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, n,0);[m
+[36m@@ -37,10 +37,10 @@[m [mpublic class VideoRenderer implements GLSurfaceView.Renderer {[m
+     }[m
+ [m
+     public void onDrawFrame(GL10 unused) {[m
+[31m-        /*GLES20.glClearColor(1,0,0,1);[m
+[32m+[m[32m        GLES20.glClearColor(1,0,0,1);[m
+         GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);[m
+[31m-        return;*/[m
+[31m-[m
+[32m+[m[32m        return;[m
+[32m+[m[32m/*[m
+         Bitmap toUpload = null;[m
+         synchronized (_bitmaps) {[m
+             toUpload = _bitmaps.poll();[m
+[36m@@ -84,6 +84,7 @@[m [mpublic class VideoRenderer implements GLSurfaceView.Renderer {[m
+         }[m
+ [m
+         render();[m
+[32m+[m[32m        */[m
+     }[m
+ [m
+     public void onSurfaceChanged(GL10 unused, int width, int height) {[m

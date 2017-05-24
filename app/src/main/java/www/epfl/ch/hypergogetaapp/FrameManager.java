@@ -2,12 +2,10 @@ package www.epfl.ch.hypergogetaapp;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
 import java.util.concurrent.ConcurrentHashMap;
-import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by SebastienSpeierer on 4/7/2017.
@@ -42,7 +40,6 @@ public class FrameManager {
 
     public void changeFirstFrame(int newFirstFrame) {
         // Read the frame number in the text field
-        //firstFrame = newFirstFrame;
         firstFrame = newFirstFrame;
 
         // Retrieve the frame from the video (time in micro seconds)
@@ -87,17 +84,8 @@ public class FrameManager {
     }
 
     public void setDataSource(Context ctx, Uri uri) {
-        MediaMetadataRetriever mmr1 = new MediaMetadataRetriever();
-        mmr1.setDataSource(ctx, uri);
-        maxNumFrame = Integer.valueOf(mmr1.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;
-
-        LoadingBGTask task = new LoadingBGTask(this, mmr1, 0, maxNumFrame);
+        LoadingBGTask task = new LoadingBGTask(this, uri, ctx);
         task.start();
-
-        //MediaMetadataRetriever mmr2 = new MediaMetadataRetriever();
-        //mmr2.setDataSource(ctx, uri);
-        //LoadingBGTask task2 = new LoadingBGTask(this, mmr2, maxNumFrame / 2, maxNumFrame);
-        //task2.start();
     }
 
     public ConcurrentHashMap<Integer, Bitmap> cache;
