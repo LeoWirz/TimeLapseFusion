@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 
 import android.graphics.Bitmap;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,6 +47,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         }
 
         if(toUpload != null){
+            Log.d("VR_TAG", "1 fromae to upload ");
             _glTextures.add(new int[1]);
             _glTextures.get(_glTextures.size()-1)[0] = uploadBitmap(toUpload);
 
@@ -93,6 +95,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     public void addFrame(Bitmap bitmap) {
         synchronized (_bitmaps) {
             _bitmaps.add(bitmap);
+            Log.d("VR_TAG", "add bitmap");
         }
     }
 
@@ -148,6 +151,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             return;
         }
         else{
+            Log.d("VR_TAG", "Nb texture " +  _glTextures.size());
             GLES20.glUseProgram(_renderVideoShader);
             GLES20.glUniform1i(_nbTextureLocation, min(_glTextures.size(), _maxTexUnit / 2));
 
