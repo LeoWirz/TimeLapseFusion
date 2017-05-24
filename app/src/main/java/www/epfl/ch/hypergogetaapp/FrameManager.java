@@ -1,15 +1,12 @@
 package www.epfl.ch.hypergogetaapp;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
-
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
@@ -17,24 +14,18 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
  */
 
 // This class internally manage the loading and buffer of frames
-public class FrameManager extends Thread {
+public class FrameManager {
     //public FrameManager(VideoRenderer vr, FFmpegMediaMetadataRetriever mmr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
-    public FrameManager(VideoRenderer vr, MediaMetadataRetriever mmr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
+    public FrameManager(VideoRenderer vr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
         this.vr = vr;
-        this.mmr = mmr;
 
         this.imgViewFirstFrame = imgViewFirstFrame;
-        this.imgViewLastFrame = imgViewLastFrame;
+        this.imgViewLastFrame  = imgViewLastFrame;
 
         firstFrame = 0;
         windowSize = 1;
 
         cache = new ConcurrentHashMap<Integer, Bitmap>();
-
-        doneLoadingFrames = false;
-
-        // TODO
-        totalFrameNumber = 100;
     }
 
     private Bitmap getFrameAt(int frameNumber) {
@@ -45,26 +36,11 @@ public class FrameManager extends Thread {
         } else {
             Log.d("SS_TAG", "getFrameAt - null");
             frame = null;
-            //frame = mmr.getFrameAtTime((long)frameNumber * ((long)1000000.f / (long)25.f), MediaMetadataRetriever.OPTION_CLOSEST);
-            //cache.put(frameNumber, frame);
         }
         return frame;
     }
 
-    private Boolean loadFrameAt(int frameNumber, int option) {
-        Log.d("SS_TAG", "loadFrameAt: " + frameNumber );
-        Bitmap frame = mmr.getFrameAtTime(frameNumber * ((long)1000000 / (long)30), option);
-        Log.d("SS_TAG", "-> frame: " + frame);
-        //Bitmap frame = mmr.getFrameAtTime();
-        if (frame != null)
-            cache.put(frameNumber, frame);
-
-        return frame != null;
-    }
-
     public void changeFirstFrame(int newFirstFrame) {
-
-
         // Read the frame number in the text field
         //firstFrame = newFirstFrame;
         firstFrame = newFirstFrame;
@@ -110,28 +86,21 @@ public class FrameManager extends Thread {
             imgViewLastFrame.setImageBitmap(bmpLastFrame);
     }
 
-    public void run() {
-        loadingProgression = 0;
+    public void setDataSource(Context ctx, Uri uri) {
+        MediaMetadataRetriever mmr1 = new MediaMetadataRetriever();
+        mmr1.setDataSource(ctx, uri);
+        maxNumFrame = Integer.valueOf(mmr1.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;
 
-        Log.d("SS_TAG", "numberOfFrames: " + maxNumFrame);
+        LoadingBGTask task = new LoadingBGTask(this, mmr1, 0, maxNumFrame);
+        task.start();
 
-        // Then load the correct images
-        for (int i = 0; i < maxNumFrame; i++) {
-            if (loadFrameAt(i, MediaMetadataRetriever.OPTION_CLOSEST)) {
-                loadingProgression = i;
-            } else {
-                Log.d("SS_TAG", "break");
-                // update slider size
-                maxNumFrame = i - 1;
-                break;
-            }
-        }
+        //MediaMetadataRetriever mmr2 = new MediaMetadataRetriever();
+        //mmr2.setDataSource(ctx, uri);
+        //LoadingBGTask task2 = new LoadingBGTask(this, mmr2, maxNumFrame / 2, maxNumFrame);
+        //task2.start();
     }
 
-    boolean doneLoadingFrames;
-    int totalFrameNumber;
-
-    private ConcurrentHashMap<Integer, Bitmap> cache;
+    public ConcurrentHashMap<Integer, Bitmap> cache;
 
     private int firstFrame;
     private int windowSize;
@@ -143,10 +112,6 @@ public class FrameManager extends Thread {
 
     // reference to the video renderer
     private VideoRenderer vr;
-
-    // Retriever with the current video bound to
-    private MediaMetadataRetriever mmr;
-    //private FFmpegMediaMetadataRetriever mmr;
 
     private ImageView imgViewFirstFrame;
     private ImageView imgViewLastFrame;

@@ -38,14 +38,13 @@ public class MainActivity extends AppCompatActivity {
         //view.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 
         // Initialize media retriever
-        retriever = new MediaMetadataRetriever();
         //retriever = new FFmpegMediaMetadataRetriever();
         showFileChooser();
 
         ImageView imgViewFirstFrame = (ImageView) findViewById(R.id.imageViewFirstFrame);
         ImageView imgViewLastFrame  = (ImageView) findViewById(R.id.imageViewLastFrame);
 
-        frameManager = new FrameManager(videoRenderer, retriever, imgViewFirstFrame, imgViewLastFrame);
+        frameManager = new FrameManager(videoRenderer, imgViewFirstFrame, imgViewLastFrame);
 
         //seekbar for first frame
         seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
@@ -156,12 +155,8 @@ public class MainActivity extends AppCompatActivity {
                 // Get the path of the selected video
                 videoUri = data.getData();
 
-                // Give it to the retriever
-                retriever.setDataSource(getApplicationContext(), videoUri);
-
-                frameManager.maxNumFrame = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;
-
-                frameManager.start();
+                frameManager.setDataSource(getApplicationContext(), videoUri);
+                //frameManager.start();
             }
         }
     }
@@ -169,10 +164,6 @@ public class MainActivity extends AppCompatActivity {
     // Path of the selected video
     private Uri videoUri;
 
-    // Handle the video
-
-    private MediaMetadataRetriever retriever;
-    //private FFmpegMediaMetadataRetriever retriever;
     private VideoRenderer videoRenderer;
     private FrameManager frameManager;
 
