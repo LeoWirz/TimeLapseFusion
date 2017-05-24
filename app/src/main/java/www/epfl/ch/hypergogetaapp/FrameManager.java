@@ -26,6 +26,7 @@ public class FrameManager extends Thread {
         seekPosition = 1;
         isPlaying = false;
         cache = new ConcurrentHashMap<Integer, Bitmap>();
+        maxWindowSizeSinceLastClear = 1;
     }
 
     private Bitmap getFrameAt(int frameNumber) {
@@ -63,17 +64,20 @@ public class FrameManager extends Thread {
             if (frame != null)
                 vr.addFrame(frame);
         }
+        maxWindowSizeSinceLastClear = windowSize;
     }
 
     public void changeWindowSize(int newWindowSize) {
 
         // Only add frames if we need more than before
-        if (newWindowSize > windowSize) {
+        if (newWindowSize > maxWindowSizeSinceLastClear) {
             for (int i = windowSize; i < newWindowSize; i++) {
                 Bitmap frame = getFrameAt(seekPosition + i);
                 if (frame != null)
                     vr.addFrame(frame);
+
             }
+            maxWindowSizeSinceLastClear = newWindowSize;
         }
 
         windowSize = newWindowSize;
@@ -132,6 +136,10 @@ public class FrameManager extends Thread {
     private Boolean isPlaying;
 
     public int loadingProgression;
+
+    private int maxWindowSizeSinceLastClear;
+
+    private Boolean hasCleared;
 
     public int maxNumFrame;
 

@@ -539,7 +539,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "   vec3 finalColor = vec3(0,0,0);\n" +
             "   float sumCoef = 0.0;\n" +
             "   for(int i=0 ; i<nbTexture ; ++i){\n" +
-            "       finalColor += texture2D( texture[i], v_texCoord).xyz; \n" +
+            "       finalColor += coefTexture[i] * texture2D( texture[i], v_texCoord).xyz; \n" +
             "       sumCoef += coefTexture[i]; \n" +
             "   }gl_FragColor = vec4(finalColor / sumCoef, 1); \n" +
             "}";

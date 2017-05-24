@@ -23,7 +23,7 @@ public class LoadingBGTask extends Thread {
         this.mainActivity = mainActivity;
         mmr = new FFmpegMediaMetadataRetriever();
         mmr.setDataSource(mainActivity, uri);
-        fm.maxNumFrame = max(Integer.valueOf(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 30, 600);
+        fm.maxNumFrame = max(Integer.valueOf(mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_DURATION)) / 30, 300);
         Log.d("SS_TAG", "maxNumFrame: " + fm.maxNumFrame);
     }
 

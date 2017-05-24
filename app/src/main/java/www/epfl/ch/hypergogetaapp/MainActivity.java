@@ -27,7 +27,7 @@ import static android.os.Build.VERSION_CODES.M;
 
 public class MainActivity extends AppCompatActivity {
 
-    final static int MAX_WINDOW_SIZE = 8;
+    final static int MAX_WINDOW_SIZE = 100;
 
     public void pause(){
         isPlaying = false;
@@ -64,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
         frameManager = new FrameManager(videoRenderer, this, seekBarFirstFrame);
         isPlaying = false;
-
-        //button play
 
         buttonPlay.setOnClickListener(new Button.OnClickListener(){
 
@@ -109,10 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -136,15 +131,8 @@ public class MainActivity extends AppCompatActivity {
                 frameManager.changeWindowSize(seekBar.getProgress());
             }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                //frameManager.changeWindowSize(seekBar.getProgress());
-            }
+            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override  public void onStopTrackingTouch(SeekBar seekBar) { }
         });
 
 
@@ -170,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarExpS.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f;
+                Float value = (1+progress) / 101.f * 8;
                 videoRenderer.setExpS(value);
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -186,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarExpC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f;
+                Float value = (1+progress) / 101.f * 8;
                 videoRenderer.setExpC(value);
             }
 
@@ -201,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarExpE.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f;
+                Float value = (1+progress) / 101.f * 8;
                 videoRenderer.setExpE(value);
             }
 
