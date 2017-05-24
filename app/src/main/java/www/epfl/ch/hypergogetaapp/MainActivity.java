@@ -57,7 +57,14 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for first frame
         seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
 
+<<<<<<< HEAD
         final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
+=======
+        // TODO find out number of frames in the video
+        seekBarFirstFrame.setMax(MAX_FRAME_NUMBER);
+
+        final TextView editTextFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
+>>>>>>> activity-main prepared for rebase
 
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
