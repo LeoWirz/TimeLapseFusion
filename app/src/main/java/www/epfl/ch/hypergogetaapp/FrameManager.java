@@ -112,7 +112,7 @@ public class FrameManager extends Thread {
                     // TODO
                     //vr.addFrameNext(getFrameAt(seekPosition));
 
-                    vr.clear();
+                    //vr.clear();
                     vr.addFrame(getFrameAt(seekPosition));
                 }
             }

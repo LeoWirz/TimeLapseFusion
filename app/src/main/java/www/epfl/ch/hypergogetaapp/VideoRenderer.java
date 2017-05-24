@@ -97,14 +97,12 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
                 + ((cappedColorTexture.size() % (_maxTexUnit/2) == 0) ? 0:1);
 
         int[] numTexturePerStep = new int[numIteration];
-        Log.w("Num iter: ", ""+numIteration);
+
         for(int i=0 ; i<numIteration ; ++i)
         {
             int start = i * (_maxTexUnit/2);
             int end = min(start + (_maxTexUnit/2), cappedColorTexture.size());
             numTexturePerStep[i] = end - start;
-
-            Log.w("TEST ", (""+start) + " " +(""+end));
 
             List<int[]> colorTex = new ArrayList<int[]>();
             List<int[]> bluredTex = new ArrayList<int[]>();
@@ -126,7 +124,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         float[] coefs = new float[_maxTexUnit];
         for(int i=numIteration-1 ; i>=0 ; --i) {
             coefs[i] = (i == numIteration - 1) ? 1.0f : coefs[i + 1] * (float) Math.pow(_sigma, ((float) numTexturePerStep[i + 1]));
-            Log.w("Coef ", ""+coefs[i]);
         }
 
 
@@ -135,6 +132,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         GLES20.glUniform1i(_nbMixTextureLoc, numIteration);
         GLES20.glUniform1fv(_mixTextureCoefLoc, _maxTexUnit, coefs, 0);
         render(_mixShader, _intermediateTextures, numIteration);
+
+        gcTextures();
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -158,7 +157,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
     public void setBrightness(float b) {}
     public void setContrast(float b) {}
-    public void setExpC(float x) { _expC = x; }
+    public void setExpC(float x) { Log.d("ExpC=", ""+x); _expC = x; }
     public void setExpS(float x) { _expS = x; }
     public void setExpE(float x) { _expE = x; }
     public void setSigma(float x) { _sigma = x; }
@@ -319,6 +318,26 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
 
         return tex[0];
+    }
+
+    private void gcTextures()
+    {
+        if(_glTextures.size() <= 100){
+            return;
+        }
+
+        List<int[]> toRemove = _glTextures.subList(0, _glTextures.size()-100);
+        List<int[]> toRemove2 = _bluredTextures.subList(0, _bluredTextures.size()-100);
+
+        _glTextures = _glTextures.subList(_glTextures.size()-100, _glTextures.size());
+        _bluredTextures = _bluredTextures.subList(_bluredTextures.size()-100, _bluredTextures.size());
+
+        for(int[] tex : toRemove){
+            GLES20.glDeleteTextures(1, tex, 0);
+        }
+        for(int[] tex : toRemove2){
+            GLES20.glDeleteTextures(1, tex, 0);
+        }
     }
 
     // upload the data into buffer
@@ -490,10 +509,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "for(int i=0 ; i<nbTexture ; ++i){\n" +
             "   color = texture2D( texture[i*2], v_texCoord );\n" +
             "   vec4 laplace = texture2D( texture[i*2+1], v_texCoord );\n" +
-            "   float weight = pow(clamp(toGrey(color.rgb-laplace.rgb),0.0,1.0),expC);\n" +
-            "   weight *= pow(saturation(color.rgb),expS);\n" +
-            "   weight *= pow(exposdness(color.rgb),expE);\n" +
-            "   weight += 0.01;\n" +
+            "   float weight = pow(clamp(toGrey(color.rgb-laplace.rgb),0.0,1.0), expC);\n" +
+            "   weight += pow(saturation(color.rgb), expS);\n" +
+            "   weight += pow(exposdness(color.rgb), expE);\n" +
+            "   //weight += 0.001;\n" +
             "   weight *= timeDecay(nbTexture-1-i);\n" +
             "   finalWeight += weight;\n" +
             "   finalColor += color*weight;\n" +
@@ -503,7 +522,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "\n" +
             "";
 
-    private static int KERNEL_SIZE = 41;
+    private static int KERNEL_SIZE = 31;
     private static final String pixelHBlurShader_src =
             "precision highp float; \n" +
             "uniform sampler2D texture[1]; \n" +

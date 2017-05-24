@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarExpS.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f * 8;
+                Float value = ((1+progress) / 101.f) * 2;
                 videoRenderer.setExpS(value);
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarExpC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f * 8;
+                Float value = ((1+progress) / 101.f) * 2;
                 videoRenderer.setExpC(value);
             }
 
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         seekBarExpE.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f * 8;
+                Float value = ((1+progress) / 101.f) * 2;
                 videoRenderer.setExpE(value);
             }
 
