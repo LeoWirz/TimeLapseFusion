@@ -21,6 +21,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import static java.lang.Math.min;
+import static java.lang.Math.pow;
 
 /**
  * Created by Williamallas on 26.03.2017.
@@ -29,13 +30,7 @@ import static java.lang.Math.min;
 public class VideoRenderer implements GLSurfaceView.Renderer {
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
-        Log.d("Enter init ", "OK");
         init();
-
-        int n[] = new int[1];
-        GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, n,0);
-        _maxTexUnit = n[0];
-        checkGLError("End Init");
     }
 
     public void onDrawFrame(GL10 unused) {
@@ -86,7 +81,60 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             GLES20.glViewport(0, 0, _winWidth, _winHeight);
         }
 
-        render();
+        if(_glTextures.isEmpty() || _windowSize == 0)
+            return;
+
+        // Render the video
+        List<int[]> cappedColorTexture = _glTextures;
+        List<int[]> cappedBluredTexture = _glTextures;
+        if(_windowSize < _glTextures.size())
+        {
+            cappedColorTexture = cappedColorTexture.subList(_glTextures.size()-_windowSize, _glTextures.size());
+            cappedBluredTexture = cappedBluredTexture.subList(_bluredTextures.size()-_windowSize, _bluredTextures.size());
+        }
+
+        int numIteration = (int)(cappedColorTexture.size() / (_maxTexUnit/2))
+                + ((cappedColorTexture.size() % (_maxTexUnit/2) == 0) ? 0:1);
+
+        int[] numTexturePerStep = new int[numIteration];
+        Log.w("Num iter: ", ""+numIteration);
+        for(int i=0 ; i<numIteration ; ++i)
+        {
+            int start = i * (_maxTexUnit/2);
+            int end = min(start + (_maxTexUnit/2), cappedColorTexture.size());
+            numTexturePerStep[i] = end - start;
+
+            Log.w("TEST ", (""+start) + " " +(""+end));
+
+            List<int[]> colorTex = new ArrayList<int[]>();
+            List<int[]> bluredTex = new ArrayList<int[]>();
+            for(int j=start ; j<end ; ++j)
+            {
+                colorTex.add(cappedColorTexture.get(j));
+                bluredTex.add(cappedBluredTexture.get(j));
+            }
+
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, _frameBuffer[0]);
+            if(_intermediateTextures[i] < 0)
+                _intermediateTextures[i] = createTexture(_winWidth, _winHeight, GLES20.GL_RGBA);
+
+            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, _intermediateTextures[i], 0);
+            render(colorTex, bluredTex);
+        }
+
+        // mix step
+        float[] coefs = new float[_maxTexUnit];
+        for(int i=numIteration-1 ; i>=0 ; --i) {
+            coefs[i] = (i == numIteration - 1) ? 1.0f : coefs[i + 1] * (float) Math.pow(_sigma, ((float) numTexturePerStep[i + 1]));
+            Log.w("Coef ", ""+coefs[i]);
+        }
+
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        GLES20.glUseProgram(_mixShader);
+        GLES20.glUniform1i(_nbMixTextureLoc, numIteration);
+        GLES20.glUniform1fv(_mixTextureCoefLoc, _maxTexUnit, coefs, 0);
+        render(_mixShader, _intermediateTextures, numIteration);
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -141,35 +189,43 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         checkGLError("CreateBuffer");
 
         _renderVideoShader = createShaderProgram(vertexShader_src, pixelShader_src);
-        checkGLError("CreateShader1");
-        _HBlurShader = createShaderProgram(vertexShader_src, pixelHBlurShader_src);
-        checkGLError("CreateShader2");
-        _VBlurShader = createShaderProgram(vertexShader_src, pixelVBlurShader_src);
-        checkGLError("CreateShader3");
         _nbTextureLocation = GLES20.glGetUniformLocation(_renderVideoShader, "nbTexture");
         _expC_loc = GLES20.glGetUniformLocation(_renderVideoShader, "expC");
         _expS_loc = GLES20.glGetUniformLocation(_renderVideoShader, "expS");
         _expE_loc = GLES20.glGetUniformLocation(_renderVideoShader, "expE");
         _sigma_loc = GLES20.glGetUniformLocation(_renderVideoShader, "sigma");
+        checkGLError("CreateShader1");
 
-        if(_expC_loc < 0 || _expS_loc < 0 || _expE_loc < 0 || _sigma_loc < 0) {
+        _HBlurShader = createShaderProgram(vertexShader_src, pixelHBlurShader_src);
+        checkGLError("CreateShader2");
+        _VBlurShader = createShaderProgram(vertexShader_src, pixelVBlurShader_src);
+        checkGLError("CreateShader3");
+
+        _mixShader = createShaderProgram(vertexShader2_src, pixelMixStepShader_src);
+        _nbMixTextureLoc = GLES20.glGetUniformLocation(_mixShader, "nbTexture");
+        _mixTextureCoefLoc = GLES20.glGetUniformLocation(_mixShader, "coefTexture");
+
+        if(_expC_loc < 0 || _expS_loc < 0 || _expE_loc < 0 || _sigma_loc < 0 || _nbMixTextureLoc < 0 || _mixTextureCoefLoc < 0) {
             Log.d("Uniform exp? ", " not found");
-            System.exit(-1);
+            //System.exit(-1);
         }
 
         GLES20.glGenFramebuffers(1, _frameBuffer, 0);
 
         GLES20.glDisable(GL10.GL_DEPTH_TEST);
         GLES20.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
-        checkGLError("EndInit");
+
+        // gen intermediate buffer
+        for(int i=0 ; i<_maxTexUnit ; ++i)
+            _intermediateTextures[i] = -1;
     }
 
-    private void render(){
-        if(_glTextures.isEmpty()){
+    private void render(List<int[]> colorTex, List<int[]> bluredTex){
+        if(colorTex.isEmpty() || colorTex.size() != bluredTex.size()){
             return;
         }
         else{
-            int numTexToUse = min(min(_glTextures.size(), _windowSize), _maxTexUnit / 2);
+            int numTexToUse = min(colorTex.size(), _maxTexUnit / 2);
 
             if(numTexToUse == 0)
                 return;
@@ -184,13 +240,12 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             int texs[] = new int[numTexToUse*2];
 
             for(int i=0 ; i<numTexToUse ; ++i){
-                texs[i*2] = _glTextures.get(i)[0];
-                texs[i*2+1] = _bluredTextures.get(i)[0];
+                texs[i*2] = colorTex.get(i)[0];
+                texs[i*2+1] = bluredTex.get(i)[0];
             }
 
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
             GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT);
-            render(_renderVideoShader, texs);
+            render(_renderVideoShader, texs, texs.length);
         }
 
         GLES20.glUseProgram(0);
@@ -199,13 +254,13 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private void render(int shader, int texture) {
         int texs[] = new int[1];
         texs[0] = texture;
-        render(shader, texs);
+        render(shader, texs, 1);
     }
 
-    private void render(int shader, int textures[]) {
+    private void render(int shader, int textures[], int numTexture) {
         GLES20.glUseProgram(shader);
 
-        for(int i=0 ; i<textures.length ; ++i) {
+        for(int i=0 ; i<numTexture ; ++i) {
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + i);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[i]);
         }
@@ -366,8 +421,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private int[] _dummyTexture = null;
     private boolean _needClear = false;
 
+    private final int _maxTexUnit = 16;
+    private int[] _intermediateTextures = new int[_maxTexUnit];
+
     private int _windowSize = 1;
-    private int _maxTexUnit = 16;
 
     private int _frameBuffer[] = new int[1];
     private FloatBuffer _vertexBuffer = null;
@@ -375,7 +432,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private ShortBuffer _indexBuffer = null;
     private int _renderVideoShader = -1, _nbTextureLocation=-1;
     private int _HBlurShader = -1, _VBlurShader = -1;
-    private boolean _dirty = true;
+    private int _mixShader = -1, _nbMixTextureLoc = -1, _mixTextureCoefLoc = -1;
 
     private float _expC  = 0.2f, _expS = 0.2f, _expE = 0.2f, _sigma = 0.7f;
     private int _expC_loc, _expS_loc, _expE_loc, _sigma_loc;
@@ -389,6 +446,15 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "void main(){ \n" +
             "   v_texCoord = texCoord; \n" +
             "   gl_Position = vec4(vertex,0,1); \n" +
+            "}";
+
+    private static final String vertexShader2_src =
+            "attribute vec2 vertex; \n" +
+            "attribute vec2 texCoord; \n" +
+            "varying vec2 v_texCoord; \n" +
+            "void main(){ \n" +
+            "   v_texCoord = texCoord; \n" +
+            "   gl_Position = vec4(vertex.x, -vertex.y, 0,1); \n" +
             "}";
 
     private static final String pixelShader_src =
@@ -445,7 +511,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "#define KERNEL_SIZE "+KERNEL_SIZE+"\n" +
             "const float STEP = 1.0/480.0;\n" +
             "void main(){ \n" +
-            "   float KERNEL[KERNEL_SIZE];\n" +
+            "   float KERNEL[KERNEL_SIZE]; gl_FragColor = vec4(0,0,0,1);\n" +
             "   for(int i=0 ; i<KERNEL_SIZE ; ++i) KERNEL[i] = 1.0/float(KERNEL_SIZE);\n" +
             "   for(int i=0 ; i<KERNEL_SIZE ; ++i) gl_FragColor += KERNEL[i] * texture2D( texture[0], v_texCoord + vec2(float(i-((KERNEL_SIZE-1)/2)) * STEP,0) ); \n" +
             "}";
@@ -457,8 +523,24 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "#define KERNEL_SIZE "+KERNEL_SIZE+"\n" +
             "const float STEP = 1.0/260.0;\n" +
             "void main(){ \n" +
-            "   float KERNEL[KERNEL_SIZE];\n" +
+            "   float KERNEL[KERNEL_SIZE]; gl_FragColor = vec4(0,0,0,1);\n" +
             "   for(int i=0 ; i<KERNEL_SIZE ; ++i) KERNEL[i] = 1.0/float(KERNEL_SIZE);\n" +
             "   for(int i=0 ; i<KERNEL_SIZE ; ++i) gl_FragColor += KERNEL[i] * texture2D( texture[0], v_texCoord + vec2(0,float(i-((KERNEL_SIZE-1)/2)) * STEP) ); \n" +
+            "}";
+
+
+    private static final String pixelMixStepShader_src =
+            "precision highp float; \n" +
+            "uniform sampler2D texture[16]; \n" +
+            "varying vec2 v_texCoord; \n" +
+            "uniform int nbTexture;\n" +
+            "uniform float coefTexture[16];\n" +
+            "void main(){ \n" +
+            "   vec3 finalColor = vec3(0,0,0);\n" +
+            "   float sumCoef = 0.0;\n" +
+            "   for(int i=0 ; i<nbTexture ; ++i){\n" +
+            "       finalColor += texture2D( texture[i], v_texCoord).xyz; \n" +
+            "       sumCoef += coefTexture[i]; \n" +
+            "   }gl_FragColor = vec4(finalColor / sumCoef, 1); \n" +
             "}";
 }
