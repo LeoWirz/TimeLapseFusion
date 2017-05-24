@@ -10,6 +10,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -20,9 +21,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    final static int MAX_WINDOW_SIZE = 15;
-    // TODO this depends on the video
-    final static int MAX_FRAME_NUMBER = 100;
+    final static int MAX_WINDOW_SIZE = 8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,31 +48,27 @@ public class MainActivity extends AppCompatActivity {
         frameManager = new FrameManager(videoRenderer, retriever, imgViewFirstFrame, imgViewLastFrame);
 
         //seekbar for first frame
-        final SeekBar seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
+        seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
 
-        // TODO find out number of frames in the video
-        seekBarFirstFrame.setMax(MAX_FRAME_NUMBER);
-
-        final EditText editTextFirstFrame = (EditText)findViewById(R.id.editTextFirstFrame);
+        final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
 
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                editTextFirstFrame.setText(String.valueOf(progress));
-
 
                 // Use this for interactive update
-                long value = seekBar.getProgress();
-                if (value <= frameManager.loadingProgressionPreview) {
-                    frameManager.changeFirstFrame(seekBar.getProgress());
+                long value = seekBar.getProgress() * frameManager.maxNumFrame / 100;
+                textViewFirstFrame.setText(Long.toString(value));
+                if (value <= frameManager.loadingProgression) {
+                    frameManager.changeFirstFrame((int)value);
                 }
 
                 if(value <= frameManager.loadingProgression) {
-                    editTextFirstFrame.setBackgroundColor(0x9900FF00);
+                    textViewFirstFrame.setBackgroundColor(0x9900FF00);
                 } else if (value <= frameManager.loadingProgressionPreview){
-                    editTextFirstFrame.setBackgroundColor(0x99AAFFAA);
+                    textViewFirstFrame.setBackgroundColor(0x99AAFFAA);
                 } else {
-                    editTextFirstFrame.setBackgroundColor(0x99AA0000);
+                    textViewFirstFrame.setBackgroundColor(0x99AA0000);
                 }
             }
 
@@ -89,30 +84,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        editTextFirstFrame.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                int value = Integer.parseInt(v.getText().toString());
-                if(value > MAX_FRAME_NUMBER){
-                    value = MAX_FRAME_NUMBER;
-                    editTextFirstFrame.setText(String.valueOf(value));
-                }
-
-                seekBarFirstFrame.setProgress(value);
-                frameManager.changeFirstFrame(value);
-                return true;
-            }
-        });
-
         //seekbar for window size
         final SeekBar seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
-        seekBarWindowSize.setMax(15);
-        final EditText editTextWindowSize = (EditText)findViewById(R.id.editTextWindowSize);
+        seekBarWindowSize.setMax(MAX_WINDOW_SIZE);
+        final TextView texViewtWindowSize = (TextView)findViewById(R.id.textTextWindowSize);
 
         seekBarWindowSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                editTextWindowSize.setText(String.valueOf(progress));
+                texViewtWindowSize.setText(String.valueOf(progress));
             }
 
             @Override
@@ -123,21 +103,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 frameManager.changeWindowSize(seekBar.getProgress());
-            }
-        });
-
-        editTextWindowSize.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                int value = Integer.parseInt(v.getText().toString());
-                if(value > MAX_WINDOW_SIZE){
-                    value = MAX_WINDOW_SIZE;
-                    editTextWindowSize.setText(String.valueOf(value));
-                }
-
-                seekBarWindowSize.setProgress(value);
-                frameManager.changeWindowSize(value);
-                return true;
             }
         });
     }
@@ -192,7 +157,9 @@ public class MainActivity extends AppCompatActivity {
                 videoUri = data.getData();
 
                 // Give it to the retriever
-                retriever.setDataSource(this, videoUri);
+                retriever.setDataSource(getApplicationContext(), videoUri);
+
+                frameManager.maxNumFrame = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)) / 30;
 
                 frameManager.start();
             }
@@ -208,4 +175,6 @@ public class MainActivity extends AppCompatActivity {
     //private FFmpegMediaMetadataRetriever retriever;
     private VideoRenderer videoRenderer;
     private FrameManager frameManager;
+
+    private SeekBar seekBarFirstFrame;
 }

@@ -18,7 +18,6 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 
 // This class internally manage the loading and buffer of frames
 public class FrameManager extends Thread {
-
     //public FrameManager(VideoRenderer vr, FFmpegMediaMetadataRetriever mmr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
     public FrameManager(VideoRenderer vr, MediaMetadataRetriever mmr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
         this.vr = vr;
@@ -36,7 +35,6 @@ public class FrameManager extends Thread {
 
         // TODO
         totalFrameNumber = 100;
-
     }
 
     private Bitmap getFrameAt(int frameNumber) {
@@ -45,47 +43,61 @@ public class FrameManager extends Thread {
         if (cache.containsKey(frameNumber)) {
             frame = cache.get(frameNumber);
         } else {
-            frame = mmr.getFrameAtTime((long)frameNumber * ((long)1000000.f / (long)25.f), MediaMetadataRetriever.OPTION_CLOSEST);
-            cache.put(frameNumber, frame);
+            Log.d("SS_TAG", "getFrameAt - null");
+            frame = null;
+            //frame = mmr.getFrameAtTime((long)frameNumber * ((long)1000000.f / (long)25.f), MediaMetadataRetriever.OPTION_CLOSEST);
+            //cache.put(frameNumber, frame);
         }
-        Log.d("SS_TAG", "getFrameAt - out");
         return frame;
     }
 
-    private void loadFrameAt(int frameNumber, int option) {
+    private Boolean loadFrameAt(int frameNumber, int option) {
         Log.d("SS_TAG", "loadFrameAt: " + frameNumber );
-        Bitmap frame = mmr.getFrameAtTime((long)frameNumber * ((long)1000000.f / (long)25.f), option);
-        cache.put(frameNumber, frame);
+        Bitmap frame = mmr.getFrameAtTime(frameNumber * ((long)1000000 / (long)30), option);
+        Log.d("SS_TAG", "-> frame: " + frame);
+        //Bitmap frame = mmr.getFrameAtTime();
+        if (frame != null)
+            cache.put(frameNumber, frame);
+
+        return frame != null;
     }
 
     public void changeFirstFrame(int newFirstFrame) {
+
+
         // Read the frame number in the text field
         //firstFrame = newFirstFrame;
-        firstFrame = newFirstFrame + 100;
+        firstFrame = newFirstFrame;
 
         // Retrieve the frame from the video (time in micro seconds)
         Bitmap bmpFirstFrame = getFrameAt(firstFrame);
         Bitmap bmpLastFrame  = getFrameAt(firstFrame + windowSize);
 
         // Display the frame
-        imgViewFirstFrame.setImageBitmap(bmpFirstFrame);
-        imgViewLastFrame.setImageBitmap(bmpLastFrame);
+        if(bmpFirstFrame != null)
+            imgViewFirstFrame.setImageBitmap(bmpFirstFrame);
+
+        if(bmpLastFrame != null)
+            imgViewLastFrame.setImageBitmap(bmpLastFrame);
 
         // update content on VideoRenderer
         vr.clear();
 
         for (int i = 0; i < windowSize; i++) {
             Bitmap frame = getFrameAt(firstFrame + i);
-            vr.addFrame(frame);
+            if (frame != null)
+                vr.addFrame(frame);
         }
     }
 
     public void changeWindowSize(int newWindowSize) {
+
         // Only add frames if we need more than before
         if (newWindowSize > windowSize) {
             for (int i = windowSize; i < newWindowSize; i++) {
                 Bitmap frame = getFrameAt(firstFrame + i);
-                vr.addFrame(frame);
+                if (frame != null)
+                    vr.addFrame(frame);
             }
         }
 
@@ -94,28 +106,31 @@ public class FrameManager extends Thread {
 
         // Display the frame
         Bitmap bmpLastFrame = getFrameAt(firstFrame + windowSize);
-        imgViewLastFrame.setImageBitmap(bmpLastFrame);
+        if(bmpLastFrame != null)
+            imgViewLastFrame.setImageBitmap(bmpLastFrame);
     }
 
     public void run() {
         loadingProgression = 0;
-        // background loading of the bitmap and cache them
-        for (int i = 0; i < totalFrameNumber; i++) {
-            loadFrameAt(100 + i, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
-            loadingProgressionPreview = i;
-        }
+
+        Log.d("SS_TAG", "numberOfFrames: " + maxNumFrame);
 
         // Then load the correct images
-        for (int i = 0; i < totalFrameNumber; i++) {
-            loadFrameAt(100 + i, MediaMetadataRetriever.OPTION_CLOSEST);
-            loadingProgression = i;
+        for (int i = 0; i < maxNumFrame; i++) {
+            if (loadFrameAt(i, MediaMetadataRetriever.OPTION_CLOSEST)) {
+                loadingProgression = i;
+            } else {
+                Log.d("SS_TAG", "break");
+                // update slider size
+                maxNumFrame = i - 1;
+                break;
+            }
         }
     }
 
     boolean doneLoadingFrames;
     int totalFrameNumber;
 
-    private Lock cacheLock;
     private ConcurrentHashMap<Integer, Bitmap> cache;
 
     private int firstFrame;
@@ -123,6 +138,8 @@ public class FrameManager extends Thread {
 
     public int loadingProgressionPreview;
     public int loadingProgression;
+
+    public int maxNumFrame;
 
     // reference to the video renderer
     private VideoRenderer vr;

@@ -55,12 +55,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="5" />
 
-            <EditText
-                android:id="@+id/editTextFirstFrame"
+            <TextView
+                android:id="@+id/textViewFirstFrame"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:inputType="number" />
+                android:text="0"/>
         </LinearLayout>
 
         <TextView
@@ -85,12 +85,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="5" />
 
-            <EditText
-                android:id="@+id/editTextWindowSize"
+            <TextView
+                android:id="@+id/textTextWindowSize"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:inputType="number" />
+                android:text="0" />
         </LinearLayout>
 
         <LinearLayout
@@ -107,7 +107,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
                 <TextView
-                    android:id="@+id/textViewFirstFrame"
+                    android:id="@+id/textViewFirstFrameLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
@@ -130,7 +130,7 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
                 <TextView
-                    android:id="@+id/textViewLastFrame"
+                    android:id="@+id/textViewLastFrameLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
