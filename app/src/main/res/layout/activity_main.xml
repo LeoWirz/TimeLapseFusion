@@ -43,7 +43,7 @@
                     android:id="@+id/textViewSliderFirstFrame"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:gravity="center"
                     android:text="First frame" />
@@ -51,7 +51,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:orientation="horizontal">
 
@@ -59,6 +59,8 @@
                         android:id="@+id/seekBarFirstFrame"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:max="100"
+                        android:progress="1"
                         android:layout_weight="5" />
 
                     <TextView
@@ -73,7 +75,7 @@
                     android:id="@+id/textViewSliderWindowSize"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:gravity="center"
                     android:text="Window size" />
@@ -81,7 +83,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:orientation="horizontal">
 
@@ -89,6 +91,8 @@
                         android:id="@+id/seekBarWindowSize"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:max="8"
+                        android:progress="4"
                         android:layout_weight="5" />
 
                     <TextView
@@ -104,7 +108,7 @@
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:gravity="center"
                     android:text="Sigma" />
@@ -112,7 +116,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:orientation="horizontal">
 
@@ -120,145 +124,126 @@
                         android:id="@+id/seekBarSigma"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:progress="50"
                         android:layout_weight="5" />
-
-                    <TextView
-                        android:id="@+id/editTextSigma"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="0" />
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/textViewExpE"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:gravity="center"
-                    android:text="Alphas" />
+                    android:text="Exposness Factor" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="15dp"
                     android:layout_weight="0.1"
                     android:orientation="horizontal">
 
                     <SeekBar
-                        android:id="@+id/seekBarAlphaC"
+                        android:id="@+id/seekBarExpE"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
+                        android:progress="50"
                         android:layout_weight="5" />
-
-                    <TextView
-                        android:id="@+id/editTextAlphaC"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="0" />
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="0.1"
-                    android:orientation="horizontal">
-
-                    <SeekBar
-                        android:id="@+id/seekBarAlphaS"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="5" />
-
-                    <TextView
-                        android:id="@+id/editTextAlphaS"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="0" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="0.1"
-                    android:orientation="horizontal">
-
-                    <SeekBar
-                        android:id="@+id/seekBarAlphaE"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="5" />
-
-                    <TextView
-                        android:id="@+id/editTextAlphaE"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:text="0" />
-                </LinearLayout>
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/textViewExpC"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="0.08"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Contrast Factor" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
                     android:orientation="horizontal">
 
-                    <LinearLayout
+                    <SeekBar
+                        android:id="@+id/seekBarExpC"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/textViewFirstFrameLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_weight="0.1"
-                            android:gravity="center"
-                            android:text="First frame" />
-
-                        <ImageView
-                            android:id="@+id/imageViewFirstFrame"
-                            android:layout_width="wrap_content"
-                            android:layout_height="150dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_weight="0.5" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/textViewLastFrameLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_weight="0.1"
-                            android:gravity="center"
-                            android:text="Last frame" />
-
-                        <ImageView
-                            android:id="@+id/imageViewLastFrame"
-                            android:layout_width="wrap_content"
-                            android:layout_height="150dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_weight="0.5" />
-                    </LinearLayout>
+                        android:progress="50"
+                        android:layout_weight="5" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/textViewExpS"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Saturation Factor" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarExpS"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:progress="50"
+                        android:layout_weight="5" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textViewBrightness"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Brightness" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarBrightness"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:progress="50"
+                        android:layout_weight="5" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textViewContrast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:text="Contrast" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:layout_weight="0.1"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seekBarContrast"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:progress="50"
+                        android:layout_weight="5" />
+                </LinearLayout>
             </LinearLayout>
         </ScrollView>
 

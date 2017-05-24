@@ -14,12 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 // This class internally manage the loading and buffer of frames
 public class FrameManager {
     //public FrameManager(VideoRenderer vr, FFmpegMediaMetadataRetriever mmr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
-    public FrameManager(VideoRenderer vr, ImageView imgViewFirstFrame, ImageView imgViewLastFrame) {
+    public FrameManager(VideoRenderer vr) {
         this.vr = vr;
-
-        this.imgViewFirstFrame = imgViewFirstFrame;
-        this.imgViewLastFrame  = imgViewLastFrame;
-
         firstFrame = 0;
         windowSize = 1;
 
@@ -38,25 +34,10 @@ public class FrameManager {
         return frame;
     }
 
-    private void updateGuides(int idx) {
-        // Retrieve the frame from the video (time in micro seconds)
-        Bitmap bmpFirstFrame = getFrameAt(idx);
-        Bitmap bmpLastFrame  = getFrameAt(idx + windowSize);
-
-        // Display the frame
-        if(bmpFirstFrame != null)
-            imgViewFirstFrame.setImageBitmap(bmpFirstFrame);
-
-        if(bmpLastFrame != null)
-            imgViewLastFrame.setImageBitmap(bmpLastFrame);
-    }
-
     // add only the current frame and render this frame only (also update the guides)
     public void changeFrameOnScroll(int newFirstFrame) {
         // Read the frame number in the text field
         firstFrame = newFirstFrame;
-
-        updateGuides(firstFrame);
 
         // update content on VideoRenderer
         vr.clear();
@@ -67,8 +48,6 @@ public class FrameManager {
     public void changeFrameOnStop(int newFirstFrame) {
         // Read the frame number in the text field
         firstFrame = newFirstFrame;
-
-        updateGuides(firstFrame);
 
         // update content on VideoRenderer
         vr.clear();
@@ -100,8 +79,6 @@ public class FrameManager {
 
         windowSize = newWindowSize;
         vr.setWindowSize(newWindowSize);
-
-        updateGuides(firstFrame);
     }
 
     public void setDataSource(Context ctx, Uri uri) {
@@ -121,7 +98,4 @@ public class FrameManager {
 
     // reference to the video renderer
     private VideoRenderer vr;
-
-    private ImageView imgViewFirstFrame;
-    private ImageView imgViewLastFrame;
 }
