@@ -30,6 +30,12 @@
             android:layout_height="230dp"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <Button
+            android:id="@+id/buttonPlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Play" />
+
         <ScrollView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">

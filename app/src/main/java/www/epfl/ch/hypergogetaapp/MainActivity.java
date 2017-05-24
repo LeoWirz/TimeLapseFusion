@@ -13,6 +13,8 @@ import android.view.KeyEvent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -48,14 +50,32 @@ public class MainActivity extends AppCompatActivity {
         // Initialize media retriever
         //retriever = new FFmpegMediaMetadataRetriever();
         showFileChooser();
-
-        frameManager = new FrameManager(videoRenderer);
-
-        //seekbar for first frame
         seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
 
-        final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
+        frameManager = new FrameManager(videoRenderer, seekBarFirstFrame);
+        isPlaying = false;
 
+        //button play
+        final Button buttonPlay = (Button)findViewById(R.id.buttonPlay);
+
+        buttonPlay.setOnClickListener(new Button.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                if(!isPlaying) {
+                    isPlaying = true;
+                    buttonPlay.setText("Pause");
+                    frameManager.play();
+                } else {
+                    isPlaying = false;
+                    buttonPlay.setText("Play");
+                    frameManager.pause();
+                }
+            }
+        });
+
+        //seekbar for first frame
+        final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -271,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 videoUri = data.getData();
 
                 frameManager.setDataSource(getApplicationContext(), videoUri);
-                //frameManager.start();
+                frameManager.start();
             }
         }
     }
@@ -283,4 +303,6 @@ public class MainActivity extends AppCompatActivity {
     private FrameManager frameManager;
 
     private SeekBar seekBarFirstFrame;
+
+    private Boolean isPlaying;
 }
