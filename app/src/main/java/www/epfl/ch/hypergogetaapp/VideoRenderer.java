@@ -48,6 +48,18 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             toUpload = _bitmaps.poll();
         }
 
+        if(_needClear && toUpload != null){
+            for(int[] tex : _glTextures){
+                GLES20.glDeleteTextures(1, tex, 0);
+            }
+            for(int[] tex : _bluredTextures){
+                GLES20.glDeleteTextures(1, tex, 0);
+            }
+            _needClear = false;
+            _glTextures.clear();
+            _bluredTextures.clear();
+        }
+
         if(toUpload != null){
             _glTextures.add(new int[1]);
             _glTextures.get(_glTextures.size()-1)[0] = uploadBitmap(toUpload);
@@ -72,18 +84,6 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
             GLES20.glViewport(0, 0, _winWidth, _winHeight);
-        }
-
-        if(_needClear){
-            for(int[] tex : _glTextures){
-                GLES20.glDeleteTextures(1, tex, 0);
-            }
-            for(int[] tex : _bluredTextures){
-                GLES20.glDeleteTextures(1, tex, 0);
-            }
-            _needClear = false;
-            _glTextures.clear();
-            _bluredTextures.clear();
         }
 
         render();
@@ -375,6 +375,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private ShortBuffer _indexBuffer = null;
     private int _renderVideoShader = -1, _nbTextureLocation=-1;
     private int _HBlurShader = -1, _VBlurShader = -1;
+    private boolean _dirty = true;
 
     private float _expC  = 0.2f, _expS = 0.2f, _expE = 0.2f, _sigma = 0.7f;
     private int _expC_loc, _expS_loc, _expE_loc, _sigma_loc;
