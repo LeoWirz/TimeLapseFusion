@@ -28,10 +28,18 @@ import static android.os.Build.VERSION_CODES.M;
 public class MainActivity extends AppCompatActivity {
 
     final static int MAX_WINDOW_SIZE = 8;
-    // TODO this depends on the video
-    final static int MAX_FRAME_NUMBER = 100;
-    final static int MAX_ALPHA_VALUE = 100;
-    final static int MAX_SIGMA_VALUE = 30;
+
+    public void pause(){
+        isPlaying = false;
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                buttonPlay.setText("Play");
+            }
+        });
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +57,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize media retriever
         //retriever = new FFmpegMediaMetadataRetriever();
-        showFileChooser();
         seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
+        buttonPlay = (Button)findViewById(R.id.buttonPlay);
 
-        frameManager = new FrameManager(videoRenderer, seekBarFirstFrame);
+        frameManager = new FrameManager(videoRenderer, this, seekBarFirstFrame);
         isPlaying = false;
 
         //button play
-        final Button buttonPlay = (Button)findViewById(R.id.buttonPlay);
 
         buttonPlay.setOnClickListener(new Button.OnClickListener(){
 
@@ -64,12 +71,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(!isPlaying) {
                     isPlaying = true;
-                    buttonPlay.setText("Pause");
                     frameManager.play();
+                    buttonPlay.setText("Pause");
                 } else {
                     isPlaying = false;
-                    buttonPlay.setText("Play");
                     frameManager.pause();
+                    buttonPlay.setText("Play");
                 }
             }
         });
@@ -79,20 +86,20 @@ public class MainActivity extends AppCompatActivity {
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
-                // Use this for interactive update
                 long value = seekBar.getProgress() * frameManager.maxNumFrame / 100;
                 textViewFirstFrame.setText(Long.toString(value));
-                if (value <= frameManager.loadingProgression) {
-                    frameManager.changeFrameOnScroll((int)value);
-                }
 
-                if(value <= frameManager.loadingProgression) {
+                if (value <= frameManager.loadingProgression) {
                     textViewFirstFrame.setBackgroundColor(0x9900FF00);
-                } else if (value <= frameManager.loadingProgressionPreview){
-                    textViewFirstFrame.setBackgroundColor(0x99AAFFAA);
                 } else {
                     textViewFirstFrame.setBackgroundColor(0x99AA0000);
+                }
+
+                if (!isPlaying) {
+                    // Use this for interactive update
+                    if (value <= frameManager.loadingProgression) {
+                        frameManager.changeFrameOnScroll((int) value);
+                    }
                 }
             }
 
@@ -110,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
         //seekbar for window size
         final SeekBar seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
         seekBarWindowSize.setMax(MAX_WINDOW_SIZE);
@@ -120,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 editTextWindowSize.setText(String.valueOf(progress));
+                frameManager.changeWindowSize(seekBar.getProgress());
             }
 
             @Override
@@ -129,25 +136,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                frameManager.changeWindowSize(seekBar.getProgress());
+                //frameManager.changeWindowSize(seekBar.getProgress());
             }
         });
 
-        editTextWindowSize.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                int value = Integer.parseInt(v.getText().toString());
-                if(value > MAX_WINDOW_SIZE){
-                    value = MAX_WINDOW_SIZE;
-                    editTextWindowSize.setText(String.valueOf(value));
-                }
-
-                seekBarWindowSize.setProgress(value);
-                frameManager.changeWindowSize(value);
-                return true;
-            }
-        });
-        
 
         //seekbar for sigma
         final SeekBar seekBarSigma = (SeekBar)findViewById(R.id.seekBarSigma);
@@ -239,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
             @Override public void onStopTrackingTouch(SeekBar seekBar) { }
         });
+
+        showFileChooser();
     }
 
     // Not important
@@ -290,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
                 // Get the path of the selected video
                 videoUri = data.getData();
 
-                frameManager.setDataSource(getApplicationContext(), videoUri);
+                frameManager.setDataSource(videoUri);
                 frameManager.start();
             }
         }
@@ -303,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
     private FrameManager frameManager;
 
     private SeekBar seekBarFirstFrame;
+    private Button buttonPlay;
 
     private Boolean isPlaying;
 }

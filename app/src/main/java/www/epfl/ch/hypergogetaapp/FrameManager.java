@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
@@ -17,9 +18,10 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 
 // This class internally manage the loading and buffer of frames
 public class FrameManager extends Thread {
-    public FrameManager(VideoRenderer vr, SeekBar seekSlider) {
+    public FrameManager(VideoRenderer vr, MainActivity mainActivity, SeekBar seekSlider) {
         this.vr = vr;
         this.seekSlider = seekSlider;
+        this.mainActivity = mainActivity;
         windowSize = 1;
         seekPosition = 1;
         isPlaying = false;
@@ -72,13 +74,6 @@ public class FrameManager extends Thread {
                 if (frame != null)
                     vr.addFrame(frame);
             }
-        } else {
-            vr.clear();
-            for (int i = 0; i < newWindowSize; i++) {
-                Bitmap frame = getFrameAt(seekPosition + i);
-                if (frame != null)
-                    vr.addFrame(frame);
-            }
         }
 
         windowSize = newWindowSize;
@@ -93,26 +88,33 @@ public class FrameManager extends Thread {
         isPlaying = false;
     }
 
-    public void setDataSource(Context ctx, Uri uri) {
-        LoadingBGTask task = new LoadingBGTask(this, uri, ctx);
+    public void setDataSource(Uri uri) {
+        LoadingBGTask task = new LoadingBGTask(this, uri, mainActivity);
         task.start();
     }
 
     public void run() {
         while(true) {
             if (isPlaying) {
-                seekPosition++;
-                seekSlider.setProgress(100 * seekPosition / maxNumFrame);
+                if (seekPosition+1 > loadingProgression) {
+                    Log.d("SS_TAG", "We are going too fast: pause");
+                    isPlaying = false;
+                    mainActivity.pause();
+                } else {
+                    seekPosition++;
 
-                // TODO
-                //vr.addFrameNext(getFrameAt(seekPosition));
+                    seekSlider.setProgress(100 * seekPosition / maxNumFrame);
 
-                vr.clear();
-                vr.addFrame(getFrameAt(seekPosition));
+                    // TODO
+                    //vr.addFrameNext(getFrameAt(seekPosition));
+
+                    vr.clear();
+                    vr.addFrame(getFrameAt(seekPosition));
+                }
             }
 
             try {
-                this.sleep((long)25);
+                this.sleep((long)30);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -129,12 +131,13 @@ public class FrameManager extends Thread {
 
     private Boolean isPlaying;
 
-    public int loadingProgressionPreview;
     public int loadingProgression;
 
     public int maxNumFrame;
 
     public SeekBar seekSlider;
+
+    private MainActivity mainActivity;
 
     // reference to the video renderer
     private VideoRenderer vr;
