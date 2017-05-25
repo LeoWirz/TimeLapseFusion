@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     final static int MAX_WINDOW_SIZE = 100;
 
-    public void pause(){
+    public void pause() {
         isPlaying = false;
 
         runOnUiThread(new Runnable() {
@@ -48,12 +48,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     int leftMaskBorder = 0;
     int topMaskBorder = 0;
     int rightMaskBorder = 0;
     int bottomMaskBorder = 0;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,18 +69,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize media retriever
         //retriever = new FFmpegMediaMetadataRetriever();
-        seekBarFirstFrame = (SeekBar)findViewById(R.id.seekBarFirstFrame);
-        buttonPlay = (Button)findViewById(R.id.buttonPlay);
+        seekBarFirstFrame = (SeekBar) findViewById(R.id.seekBarFirstFrame);
+        buttonPlay = (Button) findViewById(R.id.buttonPlay);
 
         frameManager = new FrameManager(videoRenderer, this, seekBarFirstFrame);
         isPlaying = false;
 
 
-        buttonPlay.setOnClickListener(new Button.OnClickListener(){
+        buttonPlay.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if(!isPlaying) {
+                if (!isPlaying) {
                     isPlaying = true;
                     frameManager.play();
                     buttonPlay.setText("Pause");
@@ -99,10 +97,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //seekbar for first frame
-        final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
+        final TextView textViewFirstFrame = (TextView) findViewById(R.id.textViewFirstFrame);
         //seekbar for first frame
         seekBarFirstFrame = (SeekBar) findViewById(R.id.seekBarFirstFrame);
-        
+
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -123,7 +121,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -135,9 +135,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //seekbar for window size
-        seekBarWindowSize = (SeekBar)findViewById(R.id.seekBarWindowSize);
-        seekBarWindowSize.setMax(MAX_WINDOW_SIZE-1);
-        final TextView editTextWindowSize = (TextView)findViewById(R.id.editTextWindowSize);
+        seekBarWindowSize = (SeekBar) findViewById(R.id.seekBarWindowSize);
+        seekBarWindowSize.setMax(MAX_WINDOW_SIZE - 1);
+        final TextView editTextWindowSize = (TextView) findViewById(R.id.editTextWindowSize);
 
         seekBarWindowSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -148,105 +148,141 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override  public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
 
         //seekbar for sigma
-        final SeekBar seekBarSigma = (SeekBar)findViewById(R.id.seekBarSigma);
+        final SeekBar seekBarSigma = (SeekBar) findViewById(R.id.seekBarSigma);
         seekBarSigma.setMax(100);
 
 
         seekBarSigma.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f;
+                Float value = (1 + progress) / 101.f;
                 videoRenderer.setSigma(value);
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         //seekbar for expS
-        final SeekBar seekBarExpS = (SeekBar)findViewById(R.id.seekBarExpS);
+        final SeekBar seekBarExpS = (SeekBar) findViewById(R.id.seekBarExpS);
         seekBarExpS.setMax(100);
 
         seekBarExpS.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = ((1+progress) / 101.f) * 2;
+                Float value = ((1 + progress) / 101.f) * 2;
                 videoRenderer.setExpS(value);
 
             }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
 
         //seekbar for ExpC
-        final SeekBar seekBarExpC = (SeekBar)findViewById(R.id.seekBarExpC);
+        final SeekBar seekBarExpC = (SeekBar) findViewById(R.id.seekBarExpC);
         seekBarExpC.setMax(100);
 
 
         seekBarExpC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = ((1+progress) / 101.f) * 2;
+                Float value = ((1 + progress) / 101.f) * 2;
                 videoRenderer.setExpC(value);
 
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         //seekbar for ExpE
-        final SeekBar seekBarExpE = (SeekBar)findViewById(R.id.seekBarExpE);
+        final SeekBar seekBarExpE = (SeekBar) findViewById(R.id.seekBarExpE);
         seekBarExpE.setMax(100);
 
         seekBarExpE.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = ((1+progress) / 101.f) * 2;
+                Float value = ((1 + progress) / 101.f) * 2;
                 videoRenderer.setExpE(value);
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
 
         });
 
         //seekbar for brightness
-        final SeekBar seekBarBrightness = (SeekBar)findViewById(R.id.seekBarBrightness);
+        final SeekBar seekBarBrightness = (SeekBar) findViewById(R.id.seekBarBrightness);
         seekBarBrightness.setMax(100);
 
         seekBarBrightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f;
+                Float value = (1 + progress) / 101.f;
                 videoRenderer.setBrightness(value);
 
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         //seekbar for brightness
-        final SeekBar seekBarContrast = (SeekBar)findViewById(R.id.seekBarContrast);
+        final SeekBar seekBarContrast = (SeekBar) findViewById(R.id.seekBarContrast);
         seekBarContrast.setMax(100);
 
         seekBarContrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Float value = (1+progress) / 101.f;
+                Float value = (1 + progress) / 101.f;
                 videoRenderer.setContrast(value);
             }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
 
         showFileChooser();
@@ -268,7 +304,8 @@ public class MainActivity extends AppCompatActivity {
                 list.add(bottomMaskBorder);
                 intent.putIntegerArrayListExtra("borders", list);
 
-                startActivityForResult(intent, CHOOSE_MASK_AREA);
+                //startActivityForResult(intent, CHOOSE_MASK_AREA);
+                startActivity(intent);
             }
         });
 
