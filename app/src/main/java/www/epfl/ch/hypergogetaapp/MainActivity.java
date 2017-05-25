@@ -21,6 +21,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import static android.R.attr.max;
 import static android.R.attr.maxButtonHeight;
@@ -46,6 +49,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    int leftMaskBorder = 0;
+    int topMaskBorder = 0;
+    int rightMaskBorder = 0;
+    int bottomMaskBorder = 0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         frameManager = new FrameManager(videoRenderer, this, seekBarFirstFrame);
         isPlaying = false;
+
 
         buttonPlay.setOnClickListener(new Button.OnClickListener(){
 
@@ -90,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
 
         //seekbar for first frame
         final TextView textViewFirstFrame = (TextView)findViewById(R.id.textViewFirstFrame);
+        //seekbar for first frame
+        seekBarFirstFrame = (SeekBar) findViewById(R.id.seekBarFirstFrame);
+        
         seekBarFirstFrame.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -117,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 // Use this for updating frame only when we release the slider
                 long value = seekBar.getProgress() * frameManager.maxNumFrame / 100;
                 if (value <= frameManager.loadingProgression) {
-                    frameManager.changeFrameOnStop((int)value);
+                    frameManager.changeFrameOnStop((int) value);
                 }
             }
         });
@@ -134,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 frameManager.changeWindowSize(seekBar.getProgress());
             }
 
+
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
             @Override  public void onStopTrackingTouch(SeekBar seekBar) { }
         });
@@ -142,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         //seekbar for sigma
         final SeekBar seekBarSigma = (SeekBar)findViewById(R.id.seekBarSigma);
         seekBarSigma.setMax(100);
+
 
         seekBarSigma.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -163,22 +178,24 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Float value = ((1+progress) / 101.f) * 2;
                 videoRenderer.setExpS(value);
+
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
             @Override public void onStopTrackingTouch(SeekBar seekBar) { }
         });
 
 
-
         //seekbar for ExpC
         final SeekBar seekBarExpC = (SeekBar)findViewById(R.id.seekBarExpC);
         seekBarExpC.setMax(100);
+
 
         seekBarExpC.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Float value = ((1+progress) / 101.f) * 2;
                 videoRenderer.setExpC(value);
+
             }
 
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -198,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
             @Override public void onStopTrackingTouch(SeekBar seekBar) { }
+
         });
 
         //seekbar for brightness
@@ -209,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 Float value = (1+progress) / 101.f;
                 videoRenderer.setBrightness(value);
+
             }
 
             @Override public void onStartTrackingTouch(SeekBar seekBar) { }
@@ -231,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         showFileChooser();
+
         view.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // launch mask activity
@@ -241,7 +261,14 @@ public class MainActivity extends AppCompatActivity {
 
                 //intent.putExtra("imagebitmap", image);
 
-                startActivity(intent);
+                ArrayList<Integer> list = new ArrayList<Integer>();
+                list.add(leftMaskBorder);
+                list.add(topMaskBorder);
+                list.add(rightMaskBorder);
+                list.add(bottomMaskBorder);
+                intent.putIntegerArrayListExtra("borders", list);
+
+                startActivityForResult(intent, CHOOSE_MASK_AREA);
             }
         });
 
@@ -272,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int PICK_VIDEO_REQUEST = 2;
+    private int CHOOSE_MASK_AREA = 3;
 
     // Start a File Chooser. Called at the very beginning of the app
     private void showFileChooser() {
@@ -298,6 +326,16 @@ public class MainActivity extends AppCompatActivity {
 
                 frameManager.setDataSource(videoUri);
                 frameManager.start();
+            }
+
+            if (requestCode == CHOOSE_MASK_AREA) {
+                //get the borders here
+                ArrayList<Integer> test = data.getIntegerArrayListExtra("borders");
+                leftMaskBorder = test.get(0);
+                topMaskBorder = test.get(1);
+                rightMaskBorder = test.get(2);
+                bottomMaskBorder = test.get(3);
+                Toast.makeText(getApplicationContext(), String.valueOf(leftMaskBorder), Toast.LENGTH_SHORT).show();
             }
         }
     }
