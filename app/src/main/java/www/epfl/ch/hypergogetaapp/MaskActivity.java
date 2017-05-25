@@ -25,12 +25,13 @@ public class MaskActivity extends AppCompatActivity {
 
         final ImageRectView view = (ImageRectView) findViewById(R.id.dragRectView);
 
-        Bitmap bmp = (Bitmap) getIntent().getParcelableExtra("imagebitmap");
-        view.setImageBitmap(bmp);
+        //Bitmap bmp = (Bitmap) getIntent().getParcelableExtra("imagebitmap");
+        //view.setImageBitmap(bmp);
 
         ArrayList<Integer> borders = getIntent().getIntegerArrayListExtra("borders");
         view.setBorders(borders.get(0), borders.get(1), borders.get(2), borders.get(3));
 
+        /*
         if (null != view) {
             view.setOnUpCallback(new ImageRectView.OnUpCallback() {
                 @Override
@@ -44,12 +45,13 @@ public class MaskActivity extends AppCompatActivity {
                 }
             });
         }
+        */
 
+        //set the area
         final Button setButton = (Button) findViewById(R.id.set_button);
 
         setButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //Toast.makeText(getApplicationContext(), String.valueOf(view.getBorders().get(0)), Toast.LENGTH_SHORT).show();
                 Intent returnIntent = new Intent();
                 returnIntent.putIntegerArrayListExtra("borders", view.getBorders());
                 setResult(Activity.RESULT_OK, returnIntent);
@@ -57,6 +59,7 @@ public class MaskActivity extends AppCompatActivity {
             }
         });
 
+        //reset to entire image
         final Button resetButton = (Button) findViewById(R.id.reset_button);
 
         resetButton.setOnClickListener(new View.OnClickListener() {
