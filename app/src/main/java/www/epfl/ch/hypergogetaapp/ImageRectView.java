@@ -10,6 +10,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
+
 /**
  * Created by WinLeo on 24.05.2017.
  */
@@ -46,6 +48,23 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
         init();
     }
 
+    public void setBorders(int left, int top, int right, int bottom) {
+        mStartX = left;
+        mStartY = top;
+        mEndX = right;
+        mEndY = bottom;
+        mDrawRect = true;
+    }
+
+    public ArrayList<Integer> getBorders() {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        list.add(mStartX);
+        list.add(mStartY);
+        list.add(mEndX);
+        list.add(mEndY);
+        return list;
+    }
+
     /**
      * Sets callback for up
      *
@@ -60,9 +79,9 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
      */
     private void init() {
         mRectPaint = new Paint();
-        mRectPaint.setColor(getContext().getResources().getColor(android.R.color.holo_green_light));
+        mRectPaint.setColor(getContext().getResources().getColor(android.R.color.holo_blue_dark));
         mRectPaint.setStyle(Paint.Style.STROKE);
-        mRectPaint.setStrokeWidth(5); // TODO: should take from resources
+        mRectPaint.setStrokeWidth(15);
 
         mTextPaint = new TextPaint();
         mTextPaint.setColor(getContext().getResources().getColor(android.R.color.holo_green_light));
@@ -76,8 +95,8 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mDrawRect = false;
-                mStartX = (int) event.getX() - this.getLeft();
-                mStartY = (int) event.getY() - this.getTop();
+                mStartX = (int) event.getX();
+                mStartY = (int) event.getY();
                 invalidate();
                 break;
 
@@ -86,8 +105,22 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
                 final int y = (int) event.getY();
 
                 if (!mDrawRect || Math.abs(x - mEndX) > 5 || Math.abs(y - mEndY) > 5) {
-                    mEndX = x - this.getLeft();
-                    mEndY = y - this.getTop();
+                    if (x > this.getRight()) {
+                        mEndX = this.getRight();
+                    } else if (x < 0) {
+                        mEndX = 0;
+                    } else {
+                        mEndX = x;
+                    }
+
+                    if (y > this.getBottom()) {
+                        mEndY = this.getBottom();
+                    } else if (y < 0) {
+                        mEndY = 0;
+                    } else {
+                        mEndY = y;
+                    }
+
                     invalidate();
                 }
 
@@ -113,8 +146,6 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
     protected void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
 
-        double ration = (double)this.getRight() / (double)this.getDrawable().getIntrinsicWidth();
-
         int left = Math.min(mStartX, mEndX);
         int top = Math.min(mStartY, mEndY);
         int right = Math.max(mEndX, mStartX);
@@ -122,8 +153,8 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
 
         if (mDrawRect) {
             canvas.drawRect(left, top, right, bottom, mRectPaint);
-            canvas.drawText("  (" + Math.abs(mStartX - mEndX) + ", " + Math.abs(mStartY - mEndY) + ")",
-                    Math.max(mEndX, mStartX), Math.max(mEndY, mStartY), mTextPaint);
+            //canvas.drawText("  (" + Math.abs(mStartX - mEndX) + ", " + Math.abs(mStartY - mEndY) + ")",
+            //        Math.max(mEndX, mStartX), Math.max(mEndY, mStartY), mTextPaint);
         }
     }
 
