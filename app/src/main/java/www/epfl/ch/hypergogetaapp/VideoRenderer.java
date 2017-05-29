@@ -458,7 +458,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private int _mixShader = -1, _nbMixTextureLoc = -1, _mixTextureCoefLoc = -1,
                 _brightnessLoc = -1, _contrastLoc = -1;
 
-    private float _brightness = 0.5f, _contrast = 0.5f;
+    private float _brightness = 0, _contrast = 1;
 
     private float _expC  = 0.2f, _expS = 0.2f, _expE = 0.2f, _sigma = 0.7f;
     private int _expC_loc, _expS_loc, _expE_loc, _sigma_loc;
