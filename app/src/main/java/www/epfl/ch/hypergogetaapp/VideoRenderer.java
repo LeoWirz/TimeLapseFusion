@@ -159,9 +159,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
     public void setBrightness(float b) { _brightness = (b-0.5f) * 2;}
     public void setContrast(float c) { _contrast = c * 3; }
-    public void setExpC(float x) { _expC = x; }
-    public void setExpS(float x) { _expS = x; }
-    public void setExpE(float x) { _expE = x; }
+    public void setExpC(float x) { _expC = 2.f-x; }
+    public void setExpS(float x) { _expS = 2.f-x; }
+    public void setExpE(float x) { _expE = 2.f-x; }
     public void setSigma(float x) { _sigma = x; }
 
     public void setWindowSize(int size) {
