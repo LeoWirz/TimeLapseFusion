@@ -597,6 +597,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "   gl_FragColor = vec4(finalColor / sumCoef, 1); \n" +
             "   gl_FragColor = (gl_FragColor - vec4(0.5,0.5,0.5,0.5)) * contrast + vec4(0.5,0.5,0.5,0.5);\n" +
             "   gl_FragColor += vec4(brightness,brightness,brightness,brightness);\n" +
-            "   //gl_FragColor = 0.1*gl_FragColor + 0.9*texture2D(texture[0], vec2(v_texCoord.x, 1.0-v_texCoord.y));\n" +
+            "   gl_FragColor = (v_texCoord.x > winDim.x && v_texCoord.x < winDim.y && " +
+            "                   v_texCoord.y > winDim.z && v_texCoord.y < winDim.w) ? " +
+            "       gl_FragColor : texture2D(texture[0], vec2(v_texCoord.x, 1.0-v_texCoord.y));\n" +
             "}";
 }
