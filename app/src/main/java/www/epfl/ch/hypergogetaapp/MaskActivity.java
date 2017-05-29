@@ -25,8 +25,8 @@ public class MaskActivity extends AppCompatActivity {
 
         final ImageRectView view = (ImageRectView) findViewById(R.id.dragRectView);
 
-        //Bitmap bmp = (Bitmap) getIntent().getParcelableExtra("imagebitmap");
-        //view.setImageBitmap(bmp);
+        Bitmap bmp = (Bitmap) getIntent().getParcelableExtra("imagebitmap");
+        view.setImageBitmap(bmp);
 
         ArrayList<Integer> borders = getIntent().getIntegerArrayListExtra("borders");
         view.setBorders(borders.get(0), borders.get(1), borders.get(2), borders.get(3));

@@ -293,9 +293,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, MaskActivity.class);
 
                 //TODO get image
+                Bitmap image = frameManager.cache.values().iterator().next();
                 //Bitmap image = ((BitmapDrawable)imgViewFirstFrame.getDrawable()).getBitmap();
 
-                //intent.putExtra("imagebitmap", image);
+                intent.putExtra("imagebitmap", image);
 
                 ArrayList<Integer> list = new ArrayList<Integer>();
                 list.add(leftMaskBorder);
@@ -304,8 +305,7 @@ public class MainActivity extends AppCompatActivity {
                 list.add(bottomMaskBorder);
                 intent.putIntegerArrayListExtra("borders", list);
 
-                //startActivityForResult(intent, CHOOSE_MASK_AREA);
-                startActivity(intent);
+                startActivityForResult(intent, CHOOSE_MASK_AREA);
             }
         });
 
