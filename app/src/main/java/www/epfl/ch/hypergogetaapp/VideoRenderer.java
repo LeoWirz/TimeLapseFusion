@@ -131,6 +131,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         GLES20.glUseProgram(_mixShader);
         GLES20.glUniform1i(_nbMixTextureLoc, numIteration);
         GLES20.glUniform1fv(_mixTextureCoefLoc, _maxTexUnit, coefs, 0);
+        GLES20.glUniform1f(_brightnessLoc, _brightness);
+        GLES20.glUniform1f(_contrastLoc, _contrast);
         render(_mixShader, _intermediateTextures, numIteration);
 
         gcTextures();
@@ -155,9 +157,9 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         }
     }
 
-    public void setBrightness(float b) {}
-    public void setContrast(float b) {}
-    public void setExpC(float x) { Log.d("ExpC=", ""+x); _expC = x; }
+    public void setBrightness(float b) { _brightness = b;}
+    public void setContrast(float c) { _contrast = c; }
+    public void setExpC(float x) { _expC = x; }
     public void setExpS(float x) { _expS = x; }
     public void setExpE(float x) { _expE = x; }
     public void setSigma(float x) { _sigma = x; }
@@ -203,6 +205,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _mixShader = createShaderProgram(vertexShader2_src, pixelMixStepShader_src);
         _nbMixTextureLoc = GLES20.glGetUniformLocation(_mixShader, "nbTexture");
         _mixTextureCoefLoc = GLES20.glGetUniformLocation(_mixShader, "coefTexture");
+        _brightnessLoc = GLES20.glGetUniformLocation(_mixShader, "brightness");
+        _contrastLoc = GLES20.glGetUniformLocation(_mixShader, "contrast");
 
         if(_expC_loc < 0 || _expS_loc < 0 || _expE_loc < 0 || _sigma_loc < 0 || _nbMixTextureLoc < 0 || _mixTextureCoefLoc < 0) {
             Log.d("Uniform exp? ", " not found");
@@ -451,7 +455,10 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private ShortBuffer _indexBuffer = null;
     private int _renderVideoShader = -1, _nbTextureLocation=-1;
     private int _HBlurShader = -1, _VBlurShader = -1;
-    private int _mixShader = -1, _nbMixTextureLoc = -1, _mixTextureCoefLoc = -1;
+    private int _mixShader = -1, _nbMixTextureLoc = -1, _mixTextureCoefLoc = -1,
+                _brightnessLoc = -1, _contrastLoc = -1;
+
+    private float _brightness = 0.5f, _contrast = 0.5f;
 
     private float _expC  = 0.2f, _expS = 0.2f, _expE = 0.2f, _sigma = 0.7f;
     private int _expC_loc, _expS_loc, _expE_loc, _sigma_loc;
@@ -554,12 +561,16 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "varying vec2 v_texCoord; \n" +
             "uniform int nbTexture;\n" +
             "uniform float coefTexture[16];\n" +
+            "uniform float brightness, contrast;\n" +
             "void main(){ \n" +
             "   vec3 finalColor = vec3(0,0,0);\n" +
             "   float sumCoef = 0.0;\n" +
             "   for(int i=0 ; i<nbTexture ; ++i){\n" +
             "       finalColor += coefTexture[i] * texture2D( texture[i], v_texCoord).xyz; \n" +
             "       sumCoef += coefTexture[i]; \n" +
-            "   }gl_FragColor = vec4(finalColor / sumCoef, 1); \n" +
+            "   }\n" +
+            "   gl_FragColor = vec4(finalColor / sumCoef, 1); \n" +
+            "   gl_FragColor = (gl_FragColor - vec4(0.5,0.5,0.5,0.5)) * contrast + vec4(0.5,0.5,0.5,0.5);\n" +
+            "   gl_FragColor += vec4(brightness,brightness,brightness,brightness);\n" +
             "}";
 }
