@@ -48,7 +48,10 @@ public class FrameManager extends Thread {
 
         // update content on VideoRenderer
         vr.clear();
-        vr.addFrame(getFrameAt(seekPosition));
+
+        Bitmap frame = getFrameAt(seekPosition);
+        if (frame != null)
+            vr.addFrame(frame);
     }
 
     // Add all the window of frames and render
