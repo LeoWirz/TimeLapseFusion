@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     double rightMaskBorder = 1;
     double bottomMaskBorder = 1;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -301,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 double values[] = {leftMaskBorder, topMaskBorder, rightMaskBorder, bottomMaskBorder};
                 intent.putExtra("borders", values);
 
+
                 startActivityForResult(intent, CHOOSE_MASK_AREA);
             }
         });
@@ -369,6 +371,7 @@ public class MainActivity extends AppCompatActivity {
                 topMaskBorder = values[1];
                 rightMaskBorder = values[2];
                 bottomMaskBorder = values[3];
+
                 Toast.makeText(getApplicationContext(), String.valueOf(leftMaskBorder), Toast.LENGTH_SHORT).show();
             }
         }

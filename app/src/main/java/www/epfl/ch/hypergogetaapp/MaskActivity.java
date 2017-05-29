@@ -6,7 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+<<<<<<< HEAD
 import android.util.Log;
+=======
+>>>>>>> a72258c80f8f2df10a22c47865c1fdb114094387
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
