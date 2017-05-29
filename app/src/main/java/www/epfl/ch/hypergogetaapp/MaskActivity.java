@@ -32,8 +32,8 @@ public class MaskActivity extends AppCompatActivity {
         double borders[] = getIntent().getDoubleArrayExtra("borders");
         view.setBorders(borders);
 
-        borders = view.getNormalizedBorders();
-        Toast.makeText(getApplicationContext(), String.valueOf(borders[0]) + " " + String.valueOf(borders[1]) + " " +String.valueOf(borders[2]) + " " +String.valueOf(borders[3]), Toast.LENGTH_SHORT).show();
+        //borders = view.getNormalizedBorders();
+        //Toast.makeText(getApplicationContext(), String.valueOf(borders[0]) + " " + String.valueOf(borders[1]) + " " +String.valueOf(borders[2]) + " " +String.valueOf(borders[3]), Toast.LENGTH_SHORT).show();
 
         //set the area
         final Button setButton = (Button) findViewById(R.id.set_button);

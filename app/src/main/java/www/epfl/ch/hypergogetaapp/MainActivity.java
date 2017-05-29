@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
                 topMaskBorder = values[1];
                 rightMaskBorder = values[2];
                 bottomMaskBorder = values[3];
-                //Toast.makeText(getApplicationContext(), String.valueOf(leftMaskBorder), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), String.valueOf((float) leftMaskBorder), Toast.LENGTH_SHORT).show();
 
                 videoRenderer.setWinDim((float) leftMaskBorder, (float) rightMaskBorder, (float) bottomMaskBorder, (float) bottomMaskBorder);
             }
