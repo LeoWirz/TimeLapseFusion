@@ -86,7 +86,8 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
         // Render the video
         List<int[]> cappedColorTexture = _glTextures;
-        List<int[]> cappedBluredTexture = _glTextures;
+        List<int[]> cappedBluredTexture = _bluredTextures;
+        int lastTextureId = -1;
         if(_windowSize < _glTextures.size())
         {
             cappedColorTexture = cappedColorTexture.subList(_glTextures.size()-_windowSize, _glTextures.size());
@@ -110,6 +111,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             {
                 colorTex.add(cappedColorTexture.get(j));
                 bluredTex.add(cappedBluredTexture.get(j));
+                lastTextureId = cappedColorTexture.get(j)[0];
             }
 
             GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, _frameBuffer[0]);
@@ -121,7 +123,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         }
 
         // mix step
-        float[] coefs = new float[_maxTexUnit];
+        float[] coefs = new float[_maxTexUnit-1];
         for(int i=numIteration-1 ; i>=0 ; --i) {
             coefs[i] = (i == numIteration - 1) ? 1.0f : coefs[i + 1] * (float) Math.pow(_sigma, ((float) numTexturePerStep[i + 1]));
         }
@@ -129,11 +131,21 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
         GLES20.glUseProgram(_mixShader);
-        GLES20.glUniform1i(_nbMixTextureLoc, numIteration);
-        GLES20.glUniform1fv(_mixTextureCoefLoc, _maxTexUnit, coefs, 0);
+        GLES20.glUniform1i(_nbMixTextureLoc, numIteration+1);
+        GLES20.glUniform1fv(_mixTextureCoefLoc, _maxTexUnit-1, coefs, 0);
         GLES20.glUniform1f(_brightnessLoc, _brightness);
         GLES20.glUniform1f(_contrastLoc, _contrast);
-        render(_mixShader, _intermediateTextures, numIteration);
+        GLES20.glUniform4f(_winDimLoc, _winDim[0], _winDim[1], _winDim[2], _winDim[3]);
+
+        //GLES20.glActiveTexture(GLES20.GL_TEXTURE15);
+        //GLES20.glBindTexture(lastTextureId, GLES20.GL_TEXTURE15);
+
+        int[] tex = new int[numIteration+1];
+        tex[0] = lastTextureId;
+        for(int i=0 ; i<numIteration ; ++i)
+            tex[i+1] = _intermediateTextures[i];
+
+        render(_mixShader, tex, numIteration+1);
 
         gcTextures();
     }
@@ -163,6 +175,16 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     public void setExpS(float x) { _expS = 2.f-x; }
     public void setExpE(float x) { _expE = 2.f-x; }
     public void setSigma(float x) { _sigma = x; }
+
+    public void setWinDim(float x1, float x2, float y1, float y2)
+    {
+        _winDim[0] = x1;
+        _winDim[1] = x2;
+        _winDim[2] = y1;
+        _winDim[3] = y2;
+    }
+
+    private float _winDim[] = {0,1,0,1};
 
     public void setWindowSize(int size) {
         _windowSize = size;
@@ -207,6 +229,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
         _mixTextureCoefLoc = GLES20.glGetUniformLocation(_mixShader, "coefTexture");
         _brightnessLoc = GLES20.glGetUniformLocation(_mixShader, "brightness");
         _contrastLoc = GLES20.glGetUniformLocation(_mixShader, "contrast");
+        _winDimLoc = GLES20.glGetUniformLocation(_mixShader, "winDim");
 
         if(_expC_loc < 0 || _expS_loc < 0 || _expE_loc < 0 || _sigma_loc < 0 || _nbMixTextureLoc < 0 || _mixTextureCoefLoc < 0) {
             Log.d("Uniform exp? ", " not found");
@@ -457,6 +480,7 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
     private int _HBlurShader = -1, _VBlurShader = -1;
     private int _mixShader = -1, _nbMixTextureLoc = -1, _mixTextureCoefLoc = -1,
                 _brightnessLoc = -1, _contrastLoc = -1;
+    private int _winDimLoc = -1;
 
     private float _brightness = 0, _contrast = 1;
 
@@ -560,17 +584,21 @@ public class VideoRenderer implements GLSurfaceView.Renderer {
             "uniform sampler2D texture[16]; \n" +
             "varying vec2 v_texCoord; \n" +
             "uniform int nbTexture;\n" +
-            "uniform float coefTexture[16];\n" +
+            "uniform float coefTexture[15];\n" +
             "uniform float brightness, contrast;\n" +
+            "uniform vec4 winDim;\n" +
             "void main(){ \n" +
             "   vec3 finalColor = vec3(0,0,0);\n" +
             "   float sumCoef = 0.0;\n" +
-            "   for(int i=0 ; i<nbTexture ; ++i){\n" +
-            "       finalColor += coefTexture[i] * texture2D( texture[i], v_texCoord).xyz; \n" +
+            "   for(int i=0 ; i<nbTexture-1 ; ++i){\n" +
+            "       finalColor += coefTexture[i] * texture2D( texture[i+1], v_texCoord).xyz; \n" +
             "       sumCoef += coefTexture[i]; \n" +
             "   }\n" +
             "   gl_FragColor = vec4(finalColor / sumCoef, 1); \n" +
             "   gl_FragColor = (gl_FragColor - vec4(0.5,0.5,0.5,0.5)) * contrast + vec4(0.5,0.5,0.5,0.5);\n" +
             "   gl_FragColor += vec4(brightness,brightness,brightness,brightness);\n" +
+            "   gl_FragColor = (v_texCoord.x > winDim.x && v_texCoord.x < winDim.y && " +
+            "                   v_texCoord.y > winDim.z && v_texCoord.y < winDim.w) ? " +
+            "       gl_FragColor : texture2D(texture[0], vec2(v_texCoord.x, 1.0-v_texCoord.y));\n" +
             "}";
 }
