@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -28,24 +29,11 @@ public class MaskActivity extends AppCompatActivity {
         Bitmap bmp = (Bitmap) getIntent().getParcelableExtra("imagebitmap");
         view.setImageBitmap(bmp);
 
-        ArrayList<Integer> borders = getIntent().getIntegerArrayListExtra("borders");
-        view.setBorders(borders.get(0), borders.get(1), borders.get(2), borders.get(3));
+        double borders[] = getIntent().getDoubleArrayExtra("borders");
+        view.setBorders(borders);
 
-        /*
-        if (null != view) {
-            view.setOnUpCallback(new ImageRectView.OnUpCallback() {
-                @Override
-                public void onRectFinished(final Rect rect) {
-
-                    double ratio = (double) view.getRight() / (double) view.getDrawable().getIntrinsicWidth();
-
-                    Toast.makeText(getApplicationContext(), "Rect is (" + (int) (rect.left / ratio) + ", " + (int) (rect.top / ratio) + ", " + (int) (rect.right / ratio) + ", " + (int) (rect.bottom / ratio) + ")",
-                            Toast.LENGTH_SHORT).show();
-
-                }
-            });
-        }
-        */
+        borders = view.getNormalizedBorders();
+        Toast.makeText(getApplicationContext(), String.valueOf(borders[0]) + " " + String.valueOf(borders[1]) + " " +String.valueOf(borders[2]) + " " +String.valueOf(borders[3]), Toast.LENGTH_SHORT).show();
 
         //set the area
         final Button setButton = (Button) findViewById(R.id.set_button);
@@ -53,7 +41,8 @@ public class MaskActivity extends AppCompatActivity {
         setButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent returnIntent = new Intent();
-                returnIntent.putIntegerArrayListExtra("borders", view.getBorders());
+                returnIntent.putExtra("borders", view.getNormalizedBorders());
+                //returnIntent.putIntegerArrayListExtra("borders", view.getNormalizedBorders());
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }
@@ -64,7 +53,7 @@ public class MaskActivity extends AppCompatActivity {
 
         resetButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                view.setBorders(0, 0, view.getRight(), view.getBottom());
+                view.setBorders(new double[]{0, 0, 1, 1});
                 view.invalidate();
             }
         });

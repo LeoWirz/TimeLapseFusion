@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.text.TextPaint;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
@@ -48,20 +49,28 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
         init();
     }
 
-    public void setBorders(int left, int top, int right, int bottom) {
-        mStartX = left;
-        mStartY = top;
-        mEndX = right;
-        mEndY = bottom;
+    public void setBorders(double[] list) {
+        mStartX = (int)(list[0] * this.getWidth());
+        mStartY = (int)Math.floor(list[1] * this.getHeight());
+        mEndX = (int)Math.floor(list[2] * this.getWidth());
+        mEndY = (int)Math.floor(list[3] * this.getHeight());
+        Log.v("mask", String.valueOf(mStartX));
         mDrawRect = true;
     }
 
-    public ArrayList<Integer> getBorders() {
-        ArrayList<Integer> list = new ArrayList<Integer>();
-        list.add(mStartX);
-        list.add(mStartY);
-        list.add(mEndX);
-        list.add(mEndY);
+    public double[] getNormalizedBorders() {
+
+        double left = mStartX;
+        double top = mStartY;
+        double right = mEndX;
+        double bottom = mEndY;
+
+
+        double list[] = {(double)(left/this.getWidth()),
+                (double)(top/this.getHeight()),
+                (double)(right/this.getWidth()),
+                (double)(bottom/this.getHeight())};
+
         return list;
     }
 

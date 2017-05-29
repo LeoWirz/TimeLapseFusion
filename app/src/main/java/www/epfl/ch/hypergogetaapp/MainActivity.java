@@ -48,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    int leftMaskBorder = 0;
-    int topMaskBorder = 0;
-    int rightMaskBorder = 0;
-    int bottomMaskBorder = 0;
+    double leftMaskBorder = 0;
+    double topMaskBorder = 0;
+    double rightMaskBorder = 1;
+    double bottomMaskBorder = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,12 +298,8 @@ public class MainActivity extends AppCompatActivity {
 
                 intent.putExtra("imagebitmap", image);
 
-                ArrayList<Integer> list = new ArrayList<Integer>();
-                list.add(leftMaskBorder);
-                list.add(topMaskBorder);
-                list.add(rightMaskBorder);
-                list.add(bottomMaskBorder);
-                intent.putIntegerArrayListExtra("borders", list);
+                double values[] = {leftMaskBorder, topMaskBorder, rightMaskBorder, bottomMaskBorder};
+                intent.putExtra("borders", values);
 
                 startActivityForResult(intent, CHOOSE_MASK_AREA);
             }
@@ -367,11 +363,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (requestCode == CHOOSE_MASK_AREA) {
                 //get the borders here
-                ArrayList<Integer> test = data.getIntegerArrayListExtra("borders");
-                leftMaskBorder = test.get(0);
-                topMaskBorder = test.get(1);
-                rightMaskBorder = test.get(2);
-                bottomMaskBorder = test.get(3);
+                Bundle test = data.getExtras();
+                double values[] = test.getDoubleArray("borders");
+                leftMaskBorder = values[0];
+                topMaskBorder = values[1];
+                rightMaskBorder = values[2];
+                bottomMaskBorder = values[3];
                 Toast.makeText(getApplicationContext(), String.valueOf(leftMaskBorder), Toast.LENGTH_SHORT).show();
             }
         }
