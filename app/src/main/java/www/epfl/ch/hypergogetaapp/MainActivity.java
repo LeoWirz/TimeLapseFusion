@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
                         String.valueOf(rightMaskBorder) + " " +
                         String.valueOf(bottomMaskBorder) + " ", Toast.LENGTH_LONG).show();
 
-                videoRenderer.setWinDim(leftMaskBorder, rightMaskBorder, bottomMaskBorder, topMaskBorder);
+                videoRenderer.setWinDim(leftMaskBorder, rightMaskBorder, 1f - topMaskBorder, 1f - bottomMaskBorder);
                 //videoRenderer.setWinDim(0f, 0.5f, 0f, 0.8543654f);
             }
         }
