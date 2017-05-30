@@ -50,14 +50,14 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
     }
 
     public void setBorders(double[] list) {
-        mStartX = (int)(list[0] * this.getMaxWidth());
-        mStartY = (int)Math.floor(list[1] * this.getMaxHeight());
-        mEndX = (int)Math.floor(list[2] * this.getMaxWidth());
-        mEndY = (int)Math.floor(list[3] * this.getMaxHeight());
+        mStartX = (int)(list[0] * this.getWidth());
+        mStartY = (int)Math.floor(list[1] * this.getHeight());
+        mEndX = (int)Math.floor(list[2] * this.getWidth());
+        mEndY = (int)Math.floor(list[3] * this.getHeight());
         mDrawRect = true;
     }
 
-    public double[] getNormalizedBorders() {
+    public double[] getNormalizedBorders(int width, int height) {
 
         double left = mStartX;
         double top = mStartY;
@@ -65,10 +65,10 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
         double bottom = mEndY;
 
 
-        double list[] = {(double)(left/this.getMaxWidth()),
-                (double)(top/this.getMaxHeight()),
-                (double)(right/this.getMaxWidth()),
-                (double)(bottom/this.getMaxHeight())};
+        double list[] = {(double)(left/width),
+                (double)(top/height),
+                (double)(right/width),
+                (double)(bottom/height)};
 
         return list;
     }

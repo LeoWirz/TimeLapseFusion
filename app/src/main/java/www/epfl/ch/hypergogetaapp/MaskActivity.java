@@ -26,35 +26,38 @@ public class MaskActivity extends AppCompatActivity {
 
         final ImageRectView view = (ImageRectView) findViewById(R.id.dragRectView);
 
-        Bitmap bmp = (Bitmap) getIntent().getParcelableExtra("imagebitmap");
+        Intent intent = getIntent();
+
+        Bitmap bmp = (Bitmap) intent.getParcelableExtra("imagebitmap");
         view.setImageBitmap(bmp);
 
-        double borders[] = getIntent().getDoubleArrayExtra("borders");
+        double borders[] = intent.getDoubleArrayExtra("borders");
         view.setBorders(borders);
 
         //borders = view.getNormalizedBorders();
         //Toast.makeText(getApplicationContext(), String.valueOf(borders[0]) + " " + String.valueOf(borders[1]) + " " +String.valueOf(borders[2]) + " " +String.valueOf(borders[3]), Toast.LENGTH_SHORT).show();
 
-        //set the area
+        //button to set the area
         final Button setButton = (Button) findViewById(R.id.set_button);
 
         setButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("borders", view.getNormalizedBorders());
+                returnIntent.putExtra("borders", view.getNormalizedBorders(view.getWidth(), view.getHeight()));
                 //returnIntent.putIntegerArrayListExtra("borders", view.getNormalizedBorders());
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }
         });
 
-        //reset to entire image
+        //button to reset to entire image
         final Button resetButton = (Button) findViewById(R.id.reset_button);
 
         resetButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 view.setBorders(new double[]{0, 0, 1, 1});
                 view.invalidate();
+                Toast.makeText(getApplicationContext(), String.valueOf(view.getWidth()), Toast.LENGTH_LONG).show();
             }
         });
 

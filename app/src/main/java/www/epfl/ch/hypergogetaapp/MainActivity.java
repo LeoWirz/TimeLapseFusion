@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import static android.R.attr.max;
 import static android.R.attr.maxButtonHeight;
+import static android.R.attr.right;
 import static android.os.Build.VERSION_CODES.M;
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
@@ -47,11 +48,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    double leftMaskBorder = 0;
-    double topMaskBorder = 0;
-    double rightMaskBorder = 1;
-    double bottomMaskBorder = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -365,13 +361,17 @@ public class MainActivity extends AppCompatActivity {
                 //get the borders here
                 Bundle test = data.getExtras();
                 double values[] = test.getDoubleArray("borders");
-                leftMaskBorder = values[0];
-                topMaskBorder = values[1];
-                rightMaskBorder = values[2];
-                bottomMaskBorder = values[3];
-                //Toast.makeText(getApplicationContext(), String.valueOf((float) leftMaskBorder), Toast.LENGTH_SHORT).show();
+                leftMaskBorder = (float) values[0];
+                topMaskBorder = (float) values[1];
+                rightMaskBorder = (float) values[2];
+                bottomMaskBorder = (float) values[3];
+                Toast.makeText(getApplicationContext(), String.valueOf(leftMaskBorder) + " " +
+                        String.valueOf(topMaskBorder) + " " +
+                        String.valueOf(rightMaskBorder) + " " +
+                        String.valueOf(bottomMaskBorder) + " ", Toast.LENGTH_LONG).show();
 
-                videoRenderer.setWinDim((float) leftMaskBorder, (float) rightMaskBorder, (float) bottomMaskBorder, (float) bottomMaskBorder);
+                videoRenderer.setWinDim(leftMaskBorder, rightMaskBorder, bottomMaskBorder, topMaskBorder);
+                //videoRenderer.setWinDim(0f, 0.5f, 0f, 0.8543654f);
             }
         }
     }
@@ -387,4 +387,9 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonPlay;
 
     private Boolean isPlaying;
+
+    private float leftMaskBorder = 0f;
+    private float topMaskBorder = 0f;
+    private float rightMaskBorder = 1f;
+    private float bottomMaskBorder = 1f;
 }
