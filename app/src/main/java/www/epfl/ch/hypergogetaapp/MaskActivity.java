@@ -28,8 +28,8 @@ public class MaskActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        Bitmap bmp = (Bitmap) intent.getParcelableExtra("imagebitmap");
-        view.setImageBitmap(bmp);
+        //Bitmap bmp = (Bitmap) intent.getParcelableExtra("imagebitmap");
+        view.setImageBitmap(image);
 
         double borders[] = intent.getDoubleArrayExtra("borders");
         view.setBorders(borders);
@@ -62,4 +62,7 @@ public class MaskActivity extends AppCompatActivity {
         });
 
     }
+
+    public static Bitmap image;
+
 }

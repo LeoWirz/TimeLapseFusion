@@ -292,7 +292,9 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap image = frameManager.cache.get(frameManager.seekPosition);
                 //Bitmap image = ((BitmapDrawable)imgViewFirstFrame.getDrawable()).getBitmap();
 
-                intent.putExtra("imagebitmap", image);
+                //intent.putExtra("imagebitmap", image);
+
+                MaskActivity.image = image;
 
                 double values[] = {leftMaskBorder, topMaskBorder, rightMaskBorder, bottomMaskBorder};
                 intent.putExtra("borders", values);
