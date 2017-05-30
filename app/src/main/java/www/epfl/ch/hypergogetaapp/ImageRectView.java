@@ -59,10 +59,10 @@ public class ImageRectView extends android.support.v7.widget.AppCompatImageView 
 
     public double[] getNormalizedBorders(int width, int height) {
 
-        double left = mStartX;
-        double top = mStartY;
-        double right = mEndX;
-        double bottom = mEndY;
+        double left = Math.min(mStartX, mEndX);
+        double top = Math.min(mStartY, mEndY);
+        double right = Math.max(mStartX,mEndX);
+        double bottom = Math.max(mStartY, mEndY);
 
 
         double list[] = {(double)(left/width),

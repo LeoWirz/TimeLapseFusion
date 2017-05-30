@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, MaskActivity.class);
 
                 //TODO get image
-                Bitmap image = frameManager.cache.values().iterator().next();
+                Bitmap image = frameManager.cache.get(frameManager.seekPosition);
                 //Bitmap image = ((BitmapDrawable)imgViewFirstFrame.getDrawable()).getBitmap();
 
                 intent.putExtra("imagebitmap", image);
@@ -365,12 +365,15 @@ public class MainActivity extends AppCompatActivity {
                 topMaskBorder = (float) values[1];
                 rightMaskBorder = (float) values[2];
                 bottomMaskBorder = (float) values[3];
+
+                /*
                 Toast.makeText(getApplicationContext(), String.valueOf(leftMaskBorder) + " " +
                         String.valueOf(topMaskBorder) + " " +
                         String.valueOf(rightMaskBorder) + " " +
                         String.valueOf(bottomMaskBorder) + " ", Toast.LENGTH_LONG).show();
+                        */
 
-                videoRenderer.setWinDim(leftMaskBorder, rightMaskBorder, 1f - topMaskBorder, 1f - bottomMaskBorder);
+                videoRenderer.setWinDim(leftMaskBorder, rightMaskBorder, 1f - bottomMaskBorder, 1f - topMaskBorder);
                 //videoRenderer.setWinDim(0f, 0.5f, 0f, 0.8543654f);
             }
         }
